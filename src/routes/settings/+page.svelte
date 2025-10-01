@@ -6,6 +6,10 @@
     @reference "tailwindcss";
 </style>
 
+<svelte:head>
+	<title>Calendar Settings - Daily TODOs</title>
+	<meta name="robots" content="noindex, nofollow">
+</svelte:head>
 
 <div class="container mx-auto py-20">
 

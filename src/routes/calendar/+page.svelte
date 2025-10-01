@@ -300,6 +300,11 @@
     }
 </style>
 
+<svelte:head>
+	<title>Calendar - Daily TODOs</title>
+	<meta name="robots" content="noindex, nofollow">
+</svelte:head>
+
 <header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-neutral-800 dark:border-b-neutral-950 px-2">
 	<div class="left">
 		<button

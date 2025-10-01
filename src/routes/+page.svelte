@@ -67,6 +67,11 @@
     html { scroll-behavior: smooth; }
 </style>
 
+<svelte:head>
+	<title>Daily TODOs - Fast, offline, todo calendar</title>
+	<meta name="description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data.">
+</svelte:head>
+
 <!-- Page wrapper -->
 <section class="relative min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden">
 	<!-- Decorative glow -->
