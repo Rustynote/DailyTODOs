@@ -1,1 +1,0 @@
-import{w as r}from"./Nk0Lpp7N.js";const o={hideWeekend:!0,showDone:!0,view:"month"};let e=o;{const t=localStorage.getItem("settings");if(t)try{e=JSON.parse(t)}catch(s){console.error("Error parsing stored settings:",s)}}const i=r(e);i.subscribe(t=>{localStorage.setItem("settings",JSON.stringify(t))});export{i as s};
