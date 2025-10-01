@@ -4,20 +4,13 @@
     import { Eye, EyeOff, Check, X } from '@lucide/svelte';
     import ToDo from "../../components/ToDo.svelte";
 
-    let isDark = $state(true)
-    isDark = localStorage.getItem('isDark') === 'true' || !window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    function toggleTheme() {
-        localStorage.setItem('isDark', '' + isDark);
-        isDark = !isDark;
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }
-
-    toggleTheme();
+	$effect(() => {
+        if($settings.isDark) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	});
 
     const resetHours = (d: Date) => {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
@@ -238,8 +231,8 @@
 
     const formatText = (title: string): string => {
         // Auto link
-        title = title.replace(/(?![^<]*>|[^<>]*<\/)((https?:)\/\/[a-z0-9&#=.\/\-?_]+)/g, function() {
-            return '<a class="cursor-text" href="'+arguments[4]+'" onclick="event.preventDefault()">'+(arguments[4] || arguments[4])+'</a>'
+        title = title.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/g, function() {
+            return '<a class="cursor-text" href="'+arguments[0]+'" onclick="event.preventDefault()">'+arguments[0]+'</a>'
         });
 
         // Break lines
@@ -308,9 +301,9 @@
 <header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-neutral-800 dark:border-b-neutral-950 px-2">
 	<div class="left">
 		<button
-				onclick={toggleTheme}
+				onclick={() => $settings.isDark = !$settings.isDark}
 				class="px-1 py-1 rounded cursor-pointer"
-		>{ isDark ? '🌙' : '🌞' }</button>
+		>{ $settings.isDark ? '🌙' : '🌞' }</button>
 	</div>
 	<div class="center flex mr-[-300px]">
 		<button class="mr-1 px-1 py-1 cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200" onclick={reset} title="Reset">
@@ -359,7 +352,7 @@
 							{#each todoOn(fmtDate(d)) as todo (todo.id)}
 								<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 									{#if editing !== null && editing.id === todo.id}
-										<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
+										<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 									{:else}
 										<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
 										<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
@@ -394,8 +387,8 @@
 							<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
 								{#each todoOn(fmtDate(d)) as todo (todo.id)}
 									<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
-										{#if editing !== null && editing.id === todo.id}
-											<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
+										{#if editing !== false && editing.id === todo.id}
+											<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 										{:else}
 											<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
 											<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
@@ -419,12 +412,11 @@
 	{:else}
 		<div class="day">
 			<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {selectedDate.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-700">
-				<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === selectedDate.getTime() ? ' bg-neutral-300 dark:bg-neutral-800': ''}" onclick={() => selectedDate= selectedDate}>{selectedDate.getDate()}</button>
-				<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
+				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 					{#each todoOn(fmtDate(selectedDate)) as todo (todo.id)}
 						<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 							{#if editing !== null && editing.id === todo.id}
-								<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
+								<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 							{:else}
 								<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
 								<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
