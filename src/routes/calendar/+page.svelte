@@ -357,7 +357,7 @@
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-800': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
 						<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
 							{#each todoOn(fmtDate(d)) as todo (todo.id)}
-								<div class="group w-[100] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
+								<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 									{#if editing !== null && editing.id === todo.id}
 										<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 									{:else}
@@ -393,7 +393,7 @@
 							<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-800': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
 							<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
 								{#each todoOn(fmtDate(d)) as todo (todo.id)}
-									<div class="group w-[100] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
+									<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 										{#if editing !== null && editing.id === todo.id}
 											<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 										{:else}
@@ -422,7 +422,7 @@
 				<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === selectedDate.getTime() ? ' bg-neutral-300 dark:bg-neutral-800': ''}" onclick={() => selectedDate= selectedDate}>{selectedDate.getDate()}</button>
 				<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
 					{#each todoOn(fmtDate(selectedDate)) as todo (todo.id)}
-						<div class="group w-[100] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
+						<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 							{#if editing !== null && editing.id === todo.id}
 								<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 							{:else}
