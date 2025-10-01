@@ -4,20 +4,13 @@
     import { Eye, EyeOff, Check, X } from '@lucide/svelte';
     import ToDo from "../../components/ToDo.svelte";
 
-    let isDark = $state(true)
-    isDark = localStorage.getItem('isDark') === 'true' || !window.matchMedia("(prefers-color-scheme: dark)").matches;
-
-    function toggleTheme() {
-        localStorage.setItem('isDark', '' + isDark);
-        isDark = !isDark;
-        if (isDark) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    }
-
-    toggleTheme();
+	$effect(() => {
+        if($settings.isDark) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	});
 
     const resetHours = (d: Date) => {
         return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
@@ -308,9 +301,9 @@
 <header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-neutral-800 dark:border-b-neutral-950 px-2">
 	<div class="left">
 		<button
-				onclick={toggleTheme}
+				onclick={() => $settings.isDark = !$settings.isDark}
 				class="px-1 py-1 rounded cursor-pointer"
-		>{ isDark ? '🌙' : '🌞' }</button>
+		>{ $settings.isDark ? '🌙' : '🌞' }</button>
 	</div>
 	<div class="center flex mr-[-300px]">
 		<button class="mr-1 px-1 py-1 cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200" onclick={reset} title="Reset">
@@ -419,8 +412,7 @@
 	{:else}
 		<div class="day">
 			<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {selectedDate.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-700">
-				<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === selectedDate.getTime() ? ' bg-neutral-300 dark:bg-neutral-800': ''}" onclick={() => selectedDate= selectedDate}>{selectedDate.getDate()}</button>
-				<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
+				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 					{#each todoOn(fmtDate(selectedDate)) as todo (todo.id)}
 						<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 							{#if editing !== null && editing.id === todo.id}

@@ -4,7 +4,8 @@ import { browser } from '$app/environment';
 const defaultSettings = {
     hideWeekend: true,
     showDone: true,
-    view: 'month'
+    view: 'month',
+    isDark: window.matchMedia("(prefers-color-scheme: dark)").matches
 };
 let initSettings = defaultSettings;
 if(browser) { // Ensure localStorage is accessed only in the browser
@@ -12,7 +13,17 @@ if(browser) { // Ensure localStorage is accessed only in the browser
     if (storedSettings) {
         try {
             initSettings = JSON.parse(storedSettings);
+            if(typeof initSettings === 'object') {
+                for(let key in defaultSettings) {
+                    // @ts-ignore
+                    if(defaultSettings.hasOwnProperty(key) && typeof initSettings[key] === 'undefined') {
+                        // @ts-ignore
+                        initSettings[key] = defaultSettings[key];
+                    }
+                }
+            }
         } catch (e) {
+            initSettings = defaultSettings;
             console.error("Error parsing stored settings:", e);
         }
     }
