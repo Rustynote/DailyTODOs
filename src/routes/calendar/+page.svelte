@@ -34,7 +34,10 @@
 			done: false
         };
 
+
         todos.push(todo);
+
+		editing = todo;
     };
     const todoRemove = (id: string) => {
         todos = todos.filter((e) => e.id !== id)
@@ -102,8 +105,7 @@
         const d = new Date(start)
         let i = 0;
 
-        // TODO: March 2025 has emptry top row
-        while (d <= end) {
+        while(d <= end) {
 
 			if($settings.view !== 'week' && i > 10 && d.getDay() === 1 && d.getMonth() !== current.getMonth()) {
                 break;
@@ -245,6 +247,10 @@
         e.target.style.height = (e.target.scrollHeight) + "px";
 	}
 
+    const focusElement = (node: HTMLElement) =>{
+        node.focus();
+	};
+
 </script>
 
 <style>
@@ -263,7 +269,7 @@
     }
 
     :global(html.dark) {
-        @apply bg-neutral-900 text-white transition-colors;
+        @apply bg-neutral-800 text-white transition-colors;
 
         --scrollbar-track-color: #1a1a1a;
         --scrollbar-thumb-color: #525252;
@@ -340,29 +346,29 @@
 	{#if $settings.view === 'month'}
 		<div class="flex text-center">
 			{#each weekDaysShort as weekDayShort}
-				<div class="cursor-default border-b-0 {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-r border-r-neutral-200 dark:border-r-neutral-700">{weekDayShort}</div>
+				<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
 			{/each}
 		</div>
-		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-700 text-center h-[100%]" style="--month-rows: {monthRows}">
+		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-900 text-center h-[100%]" style="--month-rows: {monthRows}">
 			{#each monthDays as d}
 				{#key fmtDate(d)}
-					<div class="h-[calc(var(--view-height)/var(--month-rows))] pb-[35px] relative flex flex-col {d.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-700">
-						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-800': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
+					<div class="h-[calc(var(--view-height)/var(--month-rows))] pb-[35px] relative flex flex-col {d.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
+						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
 						<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
 							{#each todoOn(fmtDate(d)) as todo (todo.id)}
-								<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
+								<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {editing !== false && editing.id === todo.id ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 									{#if editing !== null && editing.id === todo.id}
-										<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
+										<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 									{:else}
 										<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
 										<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
 									{/if}
-									<button class="absolute top-1 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
-									<button class="absolute top-1 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
+									<button class="absolute top-2 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
+									<button class="absolute top-2 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
 								</div>
 							{/each}
 						</div>
-						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-white dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800" onclick={
+						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
 							() => {
                                 todoAdd(d)
 							}}>
@@ -376,29 +382,29 @@
 		<div class="week">
 			<div class="flex text-center">
 				{#each weekDaysShort as weekDayShort}
-					<div class="cursor-default border-b-0 {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-r border-r-neutral-200 dark:border-r-neutral-700">{weekDayShort}</div>
+					<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
 				{/each}
 			</div>
-			<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-700 text-center h-[100%]" style="--month-rows: {monthRows}">
+			<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-800 text-center h-[100%]" style="--month-rows: {monthRows}">
 				{#each weekDays as d}
 					{#key fmtDate(d)}
-						<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {d.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-700">
-							<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-800': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
-							<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
+						<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {d.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
+							<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
+							<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 								{#each todoOn(fmtDate(d)) as todo (todo.id)}
-									<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
+									<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {editing !== false && editing.id === todo.id ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 										{#if editing !== false && editing.id === todo.id}
-											<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
+											<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 										{:else}
 											<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
 											<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
 										{/if}
-										<button class="absolute top-1 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
-										<button class="absolute top-1 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
+										<button class="absolute top-2 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
+										<button class="absolute top-2 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
 									</div>
 								{/each}
 							</div>
-							<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-white dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800" onclick={
+							<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
 							() => {
                                 todoAdd(d)
 							}}>
@@ -411,22 +417,22 @@
 		</div>
 	{:else}
 		<div class="day">
-			<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {selectedDate.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-700">
+			<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {selectedDate.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-800">
 				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 					{#each todoOn(fmtDate(selectedDate)) as todo (todo.id)}
-						<div class="group w-[100%] p-1 relative text-left rounded my-1 bg-neutral-100 dark:bg-gray-800  {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
+						<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {editing !== false && editing.id === todo.id ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
 							{#if editing !== null && editing.id === todo.id}
-								<textarea autofocus class="resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px]" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
+								<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
 							{:else}
 								<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
 								<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
 							{/if}
-							<button class="absolute top-1 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
-							<button class="absolute top-1 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
+							<button class="absolute top-2 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
+							<button class="absolute top-2 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
 						</div>
 					{/each}
 				</div>
-				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-white dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-800" onclick={
+				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
 							() => {
                                 todoAdd(selectedDate)
 							}}>
