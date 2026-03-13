@@ -17,7 +17,7 @@
 
 
 	<h2 class="mt-20 mb-2 text-3xl">Weekends</h2>
-	<label><input type="checkbox" bind:checked={$settings.hideWeekend}>Hide weekends</label>
+	<label><input type="checkbox" bind:checked={$settings.hideWeekend}> Hide weekends</label>
 
 	<h2 class="mt-20 mb-2 text-3xl">Remove Data</h2>
 	<p class="mb-4">This action cannot be undone.</p>

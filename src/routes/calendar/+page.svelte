@@ -2,7 +2,15 @@
     import {onMount} from 'svelte';
     import {settings} from '$lib/settings';
     import { Eye, EyeOff, Check, X } from '@lucide/svelte';
-    import ToDo from "../../components/ToDo.svelte";
+    import {todo, todoItems, edit} from '$lib/todos.svelte';
+
+	// $effect(() => {
+    //     $inspect($todoItems);
+	// });
+	//
+    // setTimeout(() => {
+    //     todo.add(current);
+	// }, 10000);
 
 	$effect(() => {
         if($settings.isDark) {
@@ -269,7 +277,7 @@
     }
 
     :global(html.dark) {
-        @apply bg-neutral-800 text-white transition-colors;
+        @apply bg-zinc-800 text-white transition-colors;
 
         --scrollbar-track-color: #1a1a1a;
         --scrollbar-thumb-color: #525252;
@@ -304,7 +312,7 @@
 	<meta name="robots" content="noindex, nofollow">
 </svelte:head>
 
-<header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-neutral-800 dark:border-b-neutral-950 px-2">
+<header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-zinc-800 dark:border-b-neutral-950 px-2">
 	<div class="left">
 		<button
 				onclick={() => $settings.isDark = !$settings.isDark}
