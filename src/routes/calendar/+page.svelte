@@ -1,16 +1,9 @@
 <script lang="ts">
-    import {onMount} from 'svelte';
     import {settings} from '$lib/settings';
-    import { Eye, EyeOff, Check, X } from '@lucide/svelte';
-    import {todo, todoItems, edit} from '$lib/todos.svelte';
-
-	// $effect(() => {
-    //     $inspect($todoItems);
-	// });
-	//
-    // setTimeout(() => {
-    //     todo.add(current);
-	// }, 10000);
+    import {formatDate, resetHours} from '$lib/date';
+    import { Eye, EyeOff } from '@lucide/svelte';
+    import {todos} from '$lib/todos.svelte';
+    import ToDo from '$lib/components/ToDo.svelte';
 
 	$effect(() => {
         if($settings.isDark) {
@@ -20,49 +13,7 @@
 		}
 	});
 
-    const resetHours = (d: Date) => {
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0);
-    };
-
-    // Todo functions
-
-    const LS_KEY = 'todos';
-    type TodoItem = { id: string; title: string; date: string, done: boolean };
-    let todos: TodoItem[] = $state([]);
-
-    const todoOn = (dateStr: string) => todos.filter((e) => e.date === dateStr);
-    const todoAdd = (d: Date) => {
-        const id = crypto.randomUUID();
-        const date = fmtDate(d);
-
-        const todo: TodoItem = {
-            id: id,
-            title: '',
-            date: date,
-			done: false
-        };
-
-
-        todos.push(todo);
-
-		editing = todo;
-    };
-    const todoRemove = (id: string) => {
-        todos = todos.filter((e) => e.id !== id)
-    }
-    const todoUpdate = (id: string, title: string) => {
-        todos = todos.map((e) => (e.id === id ? { ...e, title: title } : e))
-	};
-    const todoDone = (id: string, done: boolean = true) => {
-        todos = todos.map((e) => (e.id === id ? { ...e, done: done } : e))
-	};
-
     // utilities
-
-	//
-    // let settings = {
-    //     hideWeekend: true,
-    // }
 
     const views = ['month', 'week', 'day'];
 
@@ -72,8 +23,6 @@
 
     let selectedDate: Date = $state(new Date(today));
 
-    const pad2 = (n: number) => String(n).padStart(2, '0')
-    const fmtDate = (d: Date) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`
     const startOfWeek = (d: Date) => {
         const date = new Date(d)
         const day = (date.getDay() + 6) % 7 // Monday=0
@@ -159,31 +108,6 @@
         weekDaysShort = weekDaysShortRaw.splice(0, 5);
 	}
 
-    // --- State: load/save (guarded for SSR) ---
-    function load() {
-        try {
-            const rawTodos = localStorage.getItem(LS_KEY);
-            if(rawTodos) {
-                todos = JSON.parse(rawTodos);
-            }
-        } catch (e) {
-            console.error('Failed to load todos', e)
-        }
-    }
-
-    function save() {
-        localStorage.setItem(LS_KEY, JSON.stringify(todos))
-    }
-
-    onMount(() => {
-        load();
-    })
-
-    $effect(() => {
-        if(todos.length > 0)
-        	save()
-    });
-
     // --- Derived collections ---
     let monthDays: Date[] = $state([]);
     let monthRows: number = $state(0);
@@ -236,28 +160,6 @@
             selectedDate.setDate(selectedDate.getDate() + 1)
         }
     }
-
-	let editing: TodoItem|false = $state(false);
-
-    const formatText = (title: string): string => {
-        // Auto link
-        title = title.replace(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/g, function() {
-            return '<a class="cursor-text" href="'+arguments[0]+'" onclick="event.preventDefault()">'+arguments[0]+'</a>'
-        });
-
-        // Break lines
-        title = title.replace(/\n/g, '<br>');
-
-        return title;
-	}
-    const autoGrow = (e: any) => {
-        e.target.style.height = "5px";
-        e.target.style.height = (e.target.scrollHeight) + "px";
-	}
-
-    const focusElement = (node: HTMLElement) =>{
-        node.focus();
-	};
 
 </script>
 
@@ -359,26 +261,17 @@
 		</div>
 		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-900 text-center h-[100%]" style="--month-rows: {monthRows}">
 			{#each monthDays as d}
-				{#key fmtDate(d)}
+				{#key formatDate(d)}
 					<div class="h-[calc(var(--view-height)/var(--month-rows))] pb-[35px] relative flex flex-col {d.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
 						<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
-							{#each todoOn(fmtDate(d)) as todo (todo.id)}
-								<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {editing !== false && editing.id === todo.id ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
-									{#if editing !== null && editing.id === todo.id}
-										<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
-									{:else}
-										<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-										<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
-									{/if}
-									<button class="absolute top-2 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
-									<button class="absolute top-2 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
-								</div>
+							{#each todos.onDay(d) as todo}
+								<ToDo todo={todo} />
 							{/each}
 						</div>
 						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
 							() => {
-                                todoAdd(d)
+                                todos.add(d)
 							}}>
 							+
 						</button>
@@ -387,63 +280,43 @@
 			{/each}
 		</div>
 	{:else if $settings.view === 'week'}
-		<div class="week">
-			<div class="flex text-center">
-				{#each weekDaysShort as weekDayShort}
-					<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
-				{/each}
-			</div>
-			<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-800 text-center h-[100%]" style="--month-rows: {monthRows}">
-				{#each weekDays as d}
-					{#key fmtDate(d)}
-						<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {d.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
-							<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
-							<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
-								{#each todoOn(fmtDate(d)) as todo (todo.id)}
-									<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {editing !== false && editing.id === todo.id ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
-										{#if editing !== false && editing.id === todo.id}
-											<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
-										{:else}
-											<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-											<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
-										{/if}
-										<button class="absolute top-2 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
-										<button class="absolute top-2 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
-									</div>
-								{/each}
-							</div>
-							<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
-							() => {
-                                todoAdd(d)
-							}}>
-								+
-							</button>
+		<div class="flex text-center">
+			{#each weekDaysShort as weekDayShort}
+				<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
+			{/each}
+		</div>
+		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-800 text-center h-[100%]" style="--month-rows: {monthRows}">
+			{#each weekDays as d}
+				{#key formatDate(d)}
+					<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {d.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
+						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
+						<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
+							{#each todos.onDay(d) as todo}
+								<ToDo todo={todo} />
+							{/each}
 						</div>
-					{/key}
-				{/each}
-			</div>
+						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
+						() => {
+							todos.add(d)
+						}}>
+							+
+						</button>
+					</div>
+				{/key}
+			{/each}
 		</div>
 	{:else}
 		<div class="day">
 			<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {selectedDate.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-800">
 				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
-					{#each todoOn(fmtDate(selectedDate)) as todo (todo.id)}
-						<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {editing !== false && editing.id === todo.id ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" draggable="true" title="Drag to move">
-							{#if editing !== null && editing.id === todo.id}
-								<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => editing=false} onchange={(e) => todoUpdate(todo.id, e.target.value)}>{todo.title}</textarea>
-							{:else}
-								<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-								<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words cursor-text {todo.done ? 'line-through' : ''}" onclick={() => editing = todo}>{@html formatText(todo.title)}</div>
-							{/if}
-							<button class="absolute top-2 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todoRemove(todo.id)}><X size={20} /></button>
-							<button class="absolute top-2 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todoDone(todo.id, !todo.done)}><Check size={22} /></button>
-						</div>
+					{#each todos.onDay(selectedDate) as todo}
+						<ToDo todo={todo} />
 					{/each}
 				</div>
 				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
-							() => {
-                                todoAdd(selectedDate)
-							}}>
+					() => {
+						todos.add(selectedDate)
+					}}>
 					+
 				</button>
 			</div>
