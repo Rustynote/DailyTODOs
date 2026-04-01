@@ -1,17 +1,17 @@
 <script lang="ts">
     import {settings} from '$lib/settings';
     import {formatDate, resetHours} from '$lib/date';
-    import { Eye, EyeOff } from '@lucide/svelte';
+    import {ArrowBigLeft, ArrowBigRight, RefreshCcw, Eye, EyeOff} from '@lucide/svelte';
     import {todos} from '$lib/todos.svelte';
     import ToDo from '$lib/components/ToDo.svelte';
 
-	$effect(() => {
+    $effect(() => {
         if($settings.isDark) {
-			document.documentElement.classList.add('dark');
-		} else {
-			document.documentElement.classList.remove('dark');
-		}
-	});
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    });
 
     // utilities
 
@@ -34,7 +34,7 @@
     const endOfWeek = (d: Date) => {
         const s = startOfWeek(d)
         const e = new Date(s)
-		const days = $settings.hideWeekend ? 4 : 6;
+        const days = $settings.hideWeekend ? 4 : 6;
         e.setDate(s.getDate() + days)
         return e
     }
@@ -64,7 +64,7 @@
 
         while(d <= end) {
 
-			if($settings.view !== 'week' && i > 10 && d.getDay() === 1 && d.getMonth() !== current.getMonth()) {
+            if($settings.view !== 'week' && i > 10 && d.getDay() === 1 && d.getMonth() !== current.getMonth()) {
                 break;
             }
 
@@ -75,7 +75,7 @@
                 continue;
             }
 
-            if($settings.view !== 'week' && d.getMonth() !== current.getMonth() && i === diw-1) {
+            if($settings.view !== 'week' && d.getMonth() !== current.getMonth() && i === diw - 1) {
                 days = [];
                 i++;
                 d.setDate(d.getDate() + 1);
@@ -106,7 +106,7 @@
     let weekDaysShort = $state(weekDaysShortRaw);
     if($settings.hideWeekend) {
         weekDaysShort = weekDaysShortRaw.splice(0, 5);
-	}
+    }
 
     // --- Derived collections ---
     let monthDays: Date[] = $state([]);
@@ -138,9 +138,9 @@
 
     // --- Navigation ---
     function prev() {
-        if ($settings.view === 'month') {
+        if($settings.view === 'month') {
             current = new Date(current.getFullYear(), current.getMonth() - 1, 1)
-        } else if ($settings.view === 'week') {
+        } else if($settings.view === 'week') {
             selectedDate = new Date(selectedDate)
             selectedDate.setDate(selectedDate.getDate() - 7)
         } else {
@@ -150,9 +150,9 @@
     }
 
     function next() {
-        if ($settings.view === 'month') {
+        if($settings.view === 'month') {
             current = new Date(current.getFullYear(), current.getMonth() + 1, 1)
-        } else if ($settings.view === 'week') {
+        } else if($settings.view === 'week') {
             selectedDate = new Date(selectedDate)
             selectedDate.setDate(selectedDate.getDate() + 7)
         } else {
@@ -222,11 +222,8 @@
 		>{ $settings.isDark ? '🌙' : '🌞' }</button>
 	</div>
 	<div class="center flex mr-[-300px]">
-		<button class="mr-1 px-1 py-1 cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200" onclick={reset} title="Reset">
-			↻
-		</button>
 		<button class="px-1 py-1 cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200" onclick={prev} title="Previous">
-			⮜
+			<ArrowBigLeft size="20"/>
 		</button>
 		<div class="px-2 py-1">
 			{#if $settings.view === 'month'}
@@ -238,11 +235,19 @@
 			{/if}
 		</div>
 		<button class="px-1 py-1 cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200" onclick={next} title="Next">
-			⮞
+			<ArrowBigRight size="20"/>
 		</button>
 	</div>
 	<div class="right flex">
-		<button class="inline-flex items-end justify-center line-through" onclick={() => { $settings.showDone = !$settings.showDone }}>{#if $settings.showDone}<Eye />{:else}<EyeOff />{/if}<span class="pl-1">Completed</span></button>
+		<button class="mr-1 px-1 py-1 cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200" onclick={reset} title="Reset">
+			<RefreshCcw size="20"/>
+		</button>
+		<button class="inline-flex items-end justify-center line-through" onclick={() => { $settings.showDone = !$settings.showDone }}>
+			{#if $settings.showDone}
+				<Eye/>
+			{:else}
+				<EyeOff/>
+			{/if}<span class="pl-1">Completed</span></button>
 		<select bind:value={$settings.view} class="bg-neutral-100 dark:bg-neutral-800 mx-2">
 			{#each views as w}
 				<option value={w}>{w}</option>
@@ -266,7 +271,7 @@
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-800 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
 						<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
 							{#each todos.onDay(d) as todo}
-								<ToDo todo={todo} />
+								<ToDo todo={todo}/>
 							{/each}
 						</div>
 						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
@@ -292,7 +297,7 @@
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''}" onclick={() => selectedDate= d}>{d.getDate()}</button>
 						<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 							{#each todos.onDay(d) as todo}
-								<ToDo todo={todo} />
+								<ToDo todo={todo}/>
 							{/each}
 						</div>
 						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
@@ -310,7 +315,7 @@
 			<div class="h-[var(--view-height)] pb-[35px] relative flex flex-col {selectedDate.getMonth()!==current.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-800">
 				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 					{#each todos.onDay(selectedDate) as todo}
-						<ToDo todo={todo} />
+						<ToDo todo={todo}/>
 					{/each}
 				</div>
 				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
