@@ -2,13 +2,9 @@
 
 <script lang="ts">
 	import {settings} from "$lib/settings";
+	import {weekDaysShortRaw} from "$lib/vars";
 
-    // Days in a week
-    const weekDaysShortRaw = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    let weekDaysShort = weekDaysShortRaw;
-    if($settings.hideWeekend) {
-        weekDaysShort = weekDaysShortRaw.splice(0, 5);
-	}
+    let weekDaysShort = $settings.hideWeekend ? weekDaysShortRaw.slice(0, 5) : weekDaysShortRaw;
 
     let rows: number = 1;
 

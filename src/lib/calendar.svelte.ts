@@ -1,13 +1,4 @@
-import {get} from 'svelte/store';
-import {writable} from 'svelte/store';
-import {settings} from "$lib/settings";
-import {today} from "$lib/vars";
-
-const storedSettings = get(settings);
-
-const diw = storedSettings.hideWeekend ? 5 : 7;
-
-const startOfWeek = (d: Date) => {
+export const startOfWeek = (d: Date): Date => {
     const date = new Date(d);
     const day = (date.getDay() + 6) % 7; // Monday=0
 
@@ -17,20 +8,20 @@ const startOfWeek = (d: Date) => {
     return date;
 }
 
-const endOfWeek = (d: Date) => {
+export const endOfWeek = (d: Date, hideWeekend: boolean): Date => {
     const start = startOfWeek(d);
     const date = new Date(start);
-    const days = storedSettings.hideWeekend ? 4 : 6;
+    const days = hideWeekend ? 4 : 6;
 
     date.setDate(start.getDate() + days);
 
     return date;
 }
 
-const startOfMonthGrid = (firstOfMonth: Date) => {
-    firstOfMonth.setDate(1);
-
+export const startOfMonthGrid = (firstOfMonth: Date): Date => {
     const date = new Date(firstOfMonth);
+    date.setDate(1);
+
     const dow = (date.getDay() + 6) % 7; // Monday=0
 
     date.setDate(1 - dow);
@@ -39,7 +30,7 @@ const startOfMonthGrid = (firstOfMonth: Date) => {
     return date;
 }
 
-const endOfMonthGrid = (firstOfMonth: Date) => {
+export const endOfMonthGrid = (firstOfMonth: Date): Date => {
     const start = startOfMonthGrid(firstOfMonth);
     const date = new Date(start);
 
@@ -48,24 +39,27 @@ const endOfMonthGrid = (firstOfMonth: Date) => {
     return date;
 }
 
-const rangeDays = (start: Date, end: Date, current: Date) => {
+export const daysInWeek = (hideWeekend: boolean): number => hideWeekend ? 5 : 7;
+
+export const rangeDays = (start: Date, end: Date, current: Date, view: string, hideWeekend: boolean): Date[] => {
+    const diw = daysInWeek(hideWeekend);
     const d = new Date(start);
     let days: Date[] = [];
     let i = 0;
 
     while(d <= end) {
-        if(storedSettings.view !== 'week' && i > 10 && d.getDay() === 1 && d.getMonth() !== current.getMonth()) {
+        if(view !== 'week' && i > 10 && d.getDay() === 1 && d.getMonth() !== current.getMonth()) {
             break;
         }
 
         // Skip sunday and saturday if hide weekend
-        if(storedSettings.hideWeekend && [6].includes(d.getDay())) {
+        if(hideWeekend && [6].includes(d.getDay())) {
             d.setDate(d.getDate() + 2);
 
             continue;
         }
 
-        if(storedSettings.view !== 'week' && d.getMonth() !== current.getMonth() && i === diw - 1) {
+        if(view !== 'week' && d.getMonth() !== current.getMonth() && i === diw - 1) {
             days = [];
             i++;
 
@@ -80,7 +74,7 @@ const rangeDays = (start: Date, end: Date, current: Date) => {
         i++;
 
         // stop while if it's end of the week in next month
-        if(storedSettings.view !== 'week' && i > 10 && i % diw == 0 && d.getMonth() !== current.getMonth()) {
+        if(view !== 'week' && i > 10 && i % diw == 0 && d.getMonth() !== current.getMonth()) {
             break;
         }
     }
