@@ -1,8 +1,9 @@
 <script lang="ts">
     import {settings} from '$lib/settings';
-    import {formatDate, resetHours} from '$lib/date';
+    import {formatDate, monthName, weekNumber} from '$lib/date';
     import {ArrowBigLeft, ArrowBigRight, RefreshCcw, Eye, EyeOff} from '@lucide/svelte';
     import {todos} from '$lib/todos.svelte';
+    import {views, today, currentDate, selectedDate, weekDaysShort} from "$lib/vars";
     import ToDo from '$lib/components/ToDo.svelte';
 
     $effect(() => {
@@ -13,14 +14,7 @@
         }
     });
 
-    // utilities
-
-    const views = ['month', 'week', 'day'];
-
-    let today: Date = new Date();
-    today = resetHours(today);
     let current: Date = $state(new Date(today));
-
     let selectedDate: Date = $state(new Date(today));
 
     const startOfWeek = (d: Date) => {
@@ -94,18 +88,6 @@
         }
 
         return days
-    }
-
-    const monthName = (d: Date) => d.toLocaleString(undefined, {month: 'long', year: 'numeric'})
-    const weekNumber = (d: any) => {
-        d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-        return 'Week ' + Math.ceil((((d - Date.UTC(d.getUTCFullYear(), 0, 1)) / 86400000) + 1) / 7);
-    };
-    const weekDaysShortRaw = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    let weekDaysShort = $state(weekDaysShortRaw);
-    if($settings.hideWeekend) {
-        weekDaysShort = weekDaysShortRaw.splice(0, 5);
     }
 
     // --- Derived collections ---

@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import {writable} from 'svelte/store';
 
 /**
  * Default UI/settings values used on first run, and also as a fallback
