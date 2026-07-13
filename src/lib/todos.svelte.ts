@@ -28,6 +28,26 @@ export type item = {
 let items: item[] = $state([]);
 
 /**
+ * Type guard verifying that a value has the shape of a todo item.
+ *
+ * Used to validate data coming from an imported file before trusting it,
+ * since it's arbitrary user-supplied JSON rather than our own storage.
+ *
+ * @param value Value to check.
+ * @returns `true` when `value` has all the fields of an `item` with the expected types.
+ */
+function isItem(value: unknown): value is item {
+    if(typeof value !== 'object' || value === null) return false;
+
+    const candidate = value as Partial<item>;
+
+    return typeof candidate.id === 'string'
+        && typeof candidate.title === 'string'
+        && typeof candidate.date === 'string'
+        && typeof candidate.done === 'boolean';
+}
+
+/**
  * Restore saved todo items from localStorage.
  *
  * If the stored value exists and is valid JSON, it is parsed and used as the
@@ -219,5 +239,34 @@ export const todos = {
         }
 
         persist();
+    },
+
+    /**
+     * Return a snapshot of all todo items, in their current stored order.
+     *
+     * Used to build a portable export of the user's data.
+     *
+     * @returns Array of all todo items.
+     */
+    export: () => items,
+
+    /**
+     * Replace the entire todo list with the given data.
+     *
+     * Used to restore a previously exported backup. `data` is validated
+     * before being accepted; existing todos are discarded entirely on success.
+     *
+     * @param data Parsed JSON to import, expected to be an array of todo items.
+     * @returns `true` when `data` was a valid array of todo items and the import succeeded, `false` otherwise.
+     */
+    import: (data: unknown): boolean => {
+        if(!Array.isArray(data) || !data.every(isItem)) {
+            return false;
+        }
+
+        items = data;
+        persist();
+
+        return true;
     }
 }
