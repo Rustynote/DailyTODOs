@@ -82,7 +82,7 @@
 		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-800 text-center flex-1 min-h-0 grid-rows-1">
 			{#each weekDays as d}
 				{#key formatDate(d)}
-					<div class="pb-[35px] relative flex flex-col {d.getMonth()!==$currentDate.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
+					<div class="pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-900">
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''}" onclick={() => $selectedDate = d}>{d.getDate()}</button>
 						<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 							{#each todos.onDay(d) as todo}
@@ -101,7 +101,7 @@
 		</div>
 	{:else}
 		<div class="day flex-1 min-h-0">
-			<div class="h-full pb-[35px] relative flex flex-col {$selectedDate.getMonth()!==$currentDate.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-800">
+			<div class="h-full pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-800">
 				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
 					{#each todos.onDay($selectedDate) as todo}
 						<ToDo todo={todo}/>
