@@ -64,7 +64,7 @@
 
 <style>
     /* Optional: smooth scroll */
-    html { scroll-behavior: smooth; }
+    :global(html) { scroll-behavior: smooth; }
 </style>
 
 <svelte:head>

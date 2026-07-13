@@ -52,7 +52,7 @@
     }
 </style>
 
-<header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-zinc-800 dark:border-b-neutral-950 px-2">
+<header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-zinc-800 dark:border-b-neutral-950 px-2 shrink-0">
 	<div class="left">
 		<button
 				onclick={() => $settings.isDark = !$settings.isDark}

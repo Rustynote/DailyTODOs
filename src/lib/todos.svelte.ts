@@ -1,4 +1,3 @@
-import {writable} from 'svelte/store';
 import {formatDate} from '$lib/date';
 
 /**
@@ -24,10 +23,7 @@ type item = {
 };
 
 /**
- * Internal in-memory list of todo items.
- *
- * This array is initialized from localStorage on startup and is later kept in
- * sync with the exported Svelte store.
+ * Reactive in-memory list of todo items, initialized from localStorage on startup.
  */
 let items: item[] = $state([]);
 
@@ -57,28 +53,13 @@ try {
 let editing: item | null = $state(null);
 
 /**
- * Writable Svelte store containing the full list of todo items.
+ * Persist the current todo list to localStorage.
  *
- * Components can subscribe to this store to render and react to todo changes.
+ * Called after every mutation so todos survive page reloads and browser restarts.
  */
-export const todoItems = writable(items);
-
-/**
- * Writable Svelte store containing the item currently being edited.
- *
- * This allows components to reactively track whether edit mode is active and
- * which item is being edited.
- */
-export const edit = writable(editing);
-
-/**
- * Persist the current todo list to localStorage whenever the store changes.
- *
- * This ensures todos survive page reloads and browser restarts.
- */
-todoItems.subscribe(value => {
-    localStorage.setItem(LS_KEY, JSON.stringify(value));
-});
+function persist() {
+    localStorage.setItem(LS_KEY, JSON.stringify(items));
+}
 
 /**
  * Collection of helper methods for creating, updating, querying, and managing
@@ -94,8 +75,8 @@ export const todos = {
      * - the formatted date string
      * - `done` set to `false`
      *
-     * After creation, the item is added to the internal array, the `todoItems`
-     * store is updated, and the new item is set as the currently edited item.
+     * After creation, the item is added to the internal array, persisted to
+     * localStorage, and set as the currently edited item.
      *
      * @param d Date object representing the day the todo belongs to.
      */
@@ -111,10 +92,8 @@ export const todos = {
         };
 
         items.push(todo);
-        todoItems.set(items);
+        persist();
 
-        // @ts-ignore
-        edit.set(todo);
         editing = todo;
     },
 
@@ -124,8 +103,7 @@ export const todos = {
      * The target item is identified by its `id`. A new array is created where
      * only the matching item receives the updated title.
      *
-     * After the update, the `todoItems` store is refreshed so subscribers can
-     * react to the change.
+     * After the update, the change is persisted to localStorage.
      *
      * @param item Todo item that should be updated.
      * @param title New title value for the todo item.
@@ -133,21 +111,21 @@ export const todos = {
     update: (item: item, title: string) => {
         items = items.map((e) => (e.id === item.id ? {...e, title: title} : e));
 
-        todoItems.set(items);
+        persist();
     },
 
     /**
      * Remove a todo item from the collection.
      *
      * The item is matched by `id` and excluded from the new array. The updated
-     * list is then pushed to the `todoItems` store.
+     * list is then persisted to localStorage.
      *
      * @param item Todo item to remove.
      */
     delete: (item: item) => {
         items = items.filter((e) => e.id !== item.id);
 
-        todoItems.set(items);
+        persist();
     },
 
     /**
@@ -156,7 +134,7 @@ export const todos = {
      * By default, this method marks the item as done. Passing `false` allows
      * the same method to mark the item as not completed.
      *
-     * After the update, the `todoItems` store is refreshed.
+     * After the update, the change is persisted to localStorage.
      *
      * @param item Todo item whose completion state should be changed.
      * @param done Whether the item should be marked as completed. Defaults to `true`.
@@ -164,7 +142,7 @@ export const todos = {
     done: (item: item, done: boolean = true) => {
         items = items.map((e) => (e.id === item.id ? {...e, done: done} : e));
 
-        todoItems.set(items);
+        persist();
     },
 
     /**
@@ -191,8 +169,6 @@ export const todos = {
      * @param item Todo item to edit, or `null` to clear edit mode.
      */
     edit: (item: item | null) => {
-        // @ts-ignore
-        edit.set(item);
         editing = item;
     },
 

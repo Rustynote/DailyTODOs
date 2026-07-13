@@ -8,12 +8,13 @@
 
     :global(html), :global(body) {
         height: 100vh;
+        display: flex;
+        flex-direction: column;
     }
 
     :global(html) {
         @apply bg-white text-neutral-800 transition-colors;
 
-        --view-height: calc(100vh - 62px);
         --scrollbar-track-color: #f5f7fa;
         --scrollbar-thumb-color: #d1d5db;
     }
