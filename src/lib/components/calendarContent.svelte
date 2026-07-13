@@ -6,6 +6,8 @@
 	import {startOfWeek, endOfWeek, startOfMonthGrid, endOfMonthGrid, daysInWeek, rangeDays} from "$lib/calendar.svelte";
 	import {formatDate} from "$lib/date";
 	import {todos} from "$lib/todos.svelte";
+	import {dropColumn} from "$lib/dnd";
+	import {monitorForElements} from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 	import ToDo from "./ToDo.svelte";
 
 	// Number of columns in the grid: 5 when weekends are hidden, otherwise 7.
@@ -44,11 +46,36 @@
 	$effect(() => {
 		weekDays = rangeDays(weekStart, weekEnd, $currentDate, $settings.view, $settings.hideWeekend);
 	});
+
+	// Single drop monitor for the whole calendar: resolves every todo drag
+	// (started via `dragCard`) against the innermost drop target it landed
+	// on (a `dropCard` item or a `dropColumn` day container, see `$lib/dnd`)
+	// and applies the move. Centralizing this here avoids each item/column
+	// needing its own drop logic.
+	$effect(() => {
+		return monitorForElements({
+			onDrop({source, location}) {
+				const target = location.current.dropTargets[0];
+				if(!target) return;
+
+				const todoId = source.data.todoId as string;
+
+				if(target.data.type === 'card') {
+					const rect = target.element.getBoundingClientRect();
+					const isAfter = location.current.input.clientY > rect.top + rect.height / 2;
+
+					todos.move(todoId, target.data.date as string, target.data.todoId as string, isAfter ? 'after' : 'before');
+				} else if(target.data.type === 'column') {
+					todos.move(todoId, target.data.date as string, null, 'after');
+				}
+			}
+		});
+	});
 </script>
 
 <div class="calendar flex flex-col flex-1 min-h-0">
 	{#if $settings.view === 'month'}
-		<div class="flex text-center shrink-0">
+		<div class="flex text-center shrink-0 select-none">
 			{#each weekDaysShort as weekDayShort}
 				<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
 			{/each}
@@ -57,13 +84,13 @@
 			{#each monthDays as d}
 				{#key formatDate(d)}
 					<div class="pb-[35px] relative flex flex-col {d.getMonth()!==$currentDate.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
-						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-900 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''}" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<div class="flex flex-col px-2 h-[100%] overflow-y-auto">
-							{#each todos.onDay(d) as todo}
+						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-900 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
+						<div class="flex flex-col px-2 h-[100%] overflow-y-auto" use:dropColumn={formatDate(d)}>
+							{#each todos.onDay(d) as todo (todo.id)}
 								<ToDo todo={todo}/>
 							{/each}
 						</div>
-						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
+						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 select-none" onclick={
 							() => {
                                 todos.add(d)
 							}}>
@@ -74,7 +101,7 @@
 			{/each}
 		</div>
 	{:else if $settings.view === 'week'}
-		<div class="flex text-center shrink-0">
+		<div class="flex text-center shrink-0 select-none">
 			{#each weekDaysShort as weekDayShort}
 				<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
 			{/each}
@@ -83,13 +110,13 @@
 			{#each weekDays as d}
 				{#key formatDate(d)}
 					<div class="pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-900">
-						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''}" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
-							{#each todos.onDay(d) as todo}
+						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
+						<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto" use:dropColumn={formatDate(d)}>
+							{#each todos.onDay(d) as todo (todo.id)}
 								<ToDo todo={todo}/>
 							{/each}
 						</div>
-						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
+						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 select-none" onclick={
 						() => {
 							todos.add(d)
 						}}>
@@ -102,12 +129,12 @@
 	{:else}
 		<div class="day flex-1 min-h-0">
 			<div class="h-full pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-800">
-				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto">
-					{#each todos.onDay($selectedDate) as todo}
+				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto" use:dropColumn={formatDate($selectedDate)}>
+					{#each todos.onDay($selectedDate) as todo (todo.id)}
 						<ToDo todo={todo}/>
 					{/each}
 				</div>
-				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950" onclick={
+				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 select-none" onclick={
 					() => {
 						todos.add($selectedDate)
 					}}>

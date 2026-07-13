@@ -4,6 +4,7 @@
     import {todos} from '$lib/todos.svelte';
     import {settings} from "$lib/settings";
     import {Check, X} from "@lucide/svelte";
+    import {dragCard, dropCard} from "$lib/dnd";
 
 	/**
      * Todo item passed into the component through Svelte props.
@@ -101,7 +102,7 @@
     - hides completed items when the relevant setting is disabled
     - applies strike-through and reduced opacity when the item is marked done
 -->
-<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {todos.isEditCurrent(todo) ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}{todo.done ? ' line-through opacity-70' : ''}" draggable="true" title="Drag to move">
+<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 {todos.isEditCurrent(todo) ? 'bg-neutral-300 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}{todo.done ? ' line-through opacity-70' : ''}" use:dragCard={todo} use:dropCard={todo} title="Drag to move">
 	{#if todos.isEditCurrent(todo)}
 		<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => todos.edit(null)} onchange={(e: Event & { currentTarget: HTMLTextAreaElement }) => todos.update(todo, e.currentTarget.value)}>{todo.title}</textarea>
 	{:else}

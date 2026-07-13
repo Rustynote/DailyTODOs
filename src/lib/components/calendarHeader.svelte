@@ -73,7 +73,7 @@
 </style>
 
 <header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-zinc-800 dark:border-b-neutral-950 px-2 shrink-0">
-	<div class="left">
+	<div class="left select-none">
 		<button
 				onclick={() => $settings.isDark = !$settings.isDark}
 				class="px-1 py-1 rounded cursor-pointer"
@@ -96,7 +96,7 @@
 			<ArrowBigRight size="20"/>
 		</button>
 	</div>
-	<div class="right flex">
+	<div class="right flex select-none">
 		<button class="mr-1 px-1 py-1 cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200" onclick={reset} title="Reset">
 			<RefreshCcw size="20"/>
 		</button>
@@ -106,7 +106,7 @@
 			{:else}
 				<EyeOff/>
 			{/if}<span class="pl-1">Completed</span></button>
-		<select bind:value={$settings.view} class="bg-neutral-100 dark:bg-neutral-800 mx-2">
+		<select bind:value={$settings.view} class="bg-neutral-100 dark:bg-neutral-800 mx-2 select-none outline-0">
 			{#each views as w}
 				<option value={w}>{w}</option>
 			{/each}

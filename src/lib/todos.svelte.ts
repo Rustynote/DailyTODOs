@@ -15,7 +15,7 @@ const LS_KEY = 'todos';
  * @property date Formatted date string used to associate the task with a day.
  * @property done Indicates whether the task has been completed.
  */
-type item = {
+export type item = {
     id: string;
     title: string;
     date: string,
@@ -185,5 +185,39 @@ export const todos = {
      */
     isEditCurrent: (item: item | null) => {
         return item !== null && editing !== null && editing.id === item.id;
+    },
+
+    /**
+     * Move a todo item, used to implement drag-and-drop.
+     *
+     * The item is removed from its current position and reinserted either
+     * relative to `targetId`, or at the end of the list when `targetId` is
+     * `null` (e.g. dropping into empty space within a day). Its `date` is
+     * updated to `date`, so this also handles moving an item to a different day.
+     *
+     * @param id Id of the todo item being moved.
+     * @param date Date the item should belong to after the move.
+     * @param targetId Id of the todo item to position against, or `null` to append to the end.
+     * @param position Whether to insert before or after `targetId`. Ignored when `targetId` is `null`.
+     */
+    move: (id: string, date: string, targetId: string | null, position: 'before' | 'after') => {
+        if(id === targetId) return;
+
+        const dragged = items.find((e) => e.id === id);
+        if(!dragged) return;
+
+        const rest = items.filter((e) => e.id !== id);
+        const moved = {...dragged, date};
+
+        const targetIndex = targetId === null ? -1 : rest.findIndex((e) => e.id === targetId);
+        if(targetIndex === -1) {
+            items = [...rest, moved];
+        } else {
+            const insertAt = position === 'before' ? targetIndex : targetIndex + 1;
+
+            items = [...rest.slice(0, insertAt), moved, ...rest.slice(insertAt)];
+        }
+
+        persist();
     }
 }
