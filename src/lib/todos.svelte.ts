@@ -64,6 +64,24 @@ try {
 }
 
 /**
+ * Keep this tab's todo list in sync with changes made in other tabs.
+ *
+ * The `storage` event only fires on tabs other than the one that made the
+ * change, so this doesn't loop back on our own `persist()` writes below.
+ * `key` is `null` when another tab calls `localStorage.clear()` (see the
+ * "Remove Data" setting), in which case we fall back to an empty list.
+ */
+window.addEventListener('storage', (e) => {
+    if(e.key !== null && e.key !== LS_KEY) return;
+
+    try {
+        items = e.newValue ? JSON.parse(e.newValue) : [];
+    } catch(err) {
+        console.error('Failed to sync items from another tab', err);
+    }
+});
+
+/**
  * Holds the currently edited todo item.
  *
  * The value is either:
