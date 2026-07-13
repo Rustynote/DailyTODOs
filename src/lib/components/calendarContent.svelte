@@ -79,7 +79,7 @@
 	</div>
 {/snippet}
 
-<div class="calendar flex flex-col flex-1 min-h-0">
+<div class="calendar flex flex-col flex-1 min-h-0 bg-white dark:bg-neutral-800">
 	{#if $settings.view === 'month'}
 		<div class="flex text-center shrink-0 select-none">
 			{#each weekDaysShort as weekDayShort}
