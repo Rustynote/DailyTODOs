@@ -1,4 +1,9 @@
-import { writable } from 'svelte/store';
+import {writable} from 'svelte/store';
+
+/**
+ * Key used to store settings in the browser's localStorage.
+ */
+const LS_KEY = 'settings';
 
 /**
  * Default UI/settings values used on first run, and also as a fallback
@@ -12,7 +17,13 @@ const defaultSettings = {
      * If true, weekend days are hidden in the calendar UI.
      */
     hideWeekend: true,
-    
+
+    /**
+     * Day the calendar week starts on.
+     * One of the values in `$lib/vars`' `weekStartOptions`.
+     */
+    weekStart: 'monday',
+
     /**
      * If true, completed items are still shown.
      */
@@ -36,6 +47,38 @@ const defaultSettings = {
 };
 
 /**
+ * Defensive merge: if `parsed` is an object, ensure all keys from
+ * `defaultSettings` exist on it, filling in any that are missing.
+ *
+ * This keeps backwards compatibility when you add new settings later:
+ * older stored payloads won't have the new keys, so we fill them in. Falls
+ * back entirely to `defaultSettings` when `parsed` isn't a plain object.
+ *
+ * @param {any} parsed Settings object to merge, typically freshly parsed from JSON.
+ * @returns `parsed` with any missing keys filled in from `defaultSettings`.
+ */
+function mergeWithDefaults(parsed) {
+    if (typeof parsed !== 'object' || parsed === null) {
+        return defaultSettings;
+    }
+
+    for (let key in defaultSettings) {
+        /**
+         * TypeScript note:
+         * Accessing dynamic keys on a typed object often triggers index
+         * signature errors; the existing code uses @ts-ignore to silence it.
+         */
+        // @ts-ignore
+        if (defaultSettings.hasOwnProperty(key) && typeof parsed[key] === 'undefined') {
+            // @ts-ignore
+            parsed[key] = defaultSettings[key];
+        }
+    }
+
+    return parsed;
+}
+
+/**
  * `initSettings` is what we will actually seed the store with.
  * It starts as defaults, then we try to override/merge from localStorage.
  */
@@ -45,33 +88,10 @@ let initSettings = defaultSettings;
  * Read any previously persisted settings from localStorage.
  * localStorage stores strings, so we parse JSON back into an object.
  */
-const storedSettings = localStorage.getItem('settings');
+const storedSettings = localStorage.getItem(LS_KEY);
 if (storedSettings) {
     try {
-        // Attempt to parse the stored JSON string into an object.
-        initSettings = JSON.parse(storedSettings);
-        
-        /**
-         * Defensive merge: if the parsed value is an object, ensure
-         * all keys from `defaultSettings` exist on `initSettings`.
-         *
-         * This keeps backwards compatibility when you add new settings later:
-         * older stored payloads won't have the new keys, so we fill them in.
-         */
-        if (typeof initSettings === 'object') {
-            for (let key in defaultSettings) {
-                /**
-                 * TypeScript note:
-                 * Accessing dynamic keys on a typed object often triggers index
-                 * signature errors; the existing code uses @ts-ignore to silence it.
-                 */
-                // @ts-ignore
-                if (defaultSettings.hasOwnProperty(key) && typeof initSettings[key] === 'undefined') {
-                    // @ts-ignore
-                    initSettings[key] = defaultSettings[key];
-                }
-            }
-        }
+        initSettings = mergeWithDefaults(JSON.parse(storedSettings));
     } catch (e) {
         /**
          * If parsing fails (corrupt value, partial write, manual edits, etc.),
@@ -97,5 +117,23 @@ export const settings = writable(initSettings);
  *
  */
 settings.subscribe(value => {
-    localStorage.setItem('settings', JSON.stringify(value));
+    localStorage.setItem(LS_KEY, JSON.stringify(value));
+});
+
+/**
+ * Keep this tab's settings in sync with changes made in other tabs.
+ *
+ * The `storage` event only fires on tabs other than the one that made the
+ * change, so this doesn't loop back on our own `subscribe` write above.
+ * `key` is `null` when another tab calls `localStorage.clear()` (see the
+ * "Remove Data" setting), in which case we fall back to defaults.
+ */
+window.addEventListener('storage', (e) => {
+    if (e.key !== null && e.key !== LS_KEY) return;
+
+    try {
+        settings.set(e.newValue ? mergeWithDefaults(JSON.parse(e.newValue)) : defaultSettings);
+    } catch (err) {
+        console.error('Failed to sync settings from another tab', err);
+    }
 });

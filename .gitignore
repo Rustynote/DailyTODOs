@@ -1,4 +1,5 @@
 .idea
+.claude/launch.json
 node_modules
 
 # Output

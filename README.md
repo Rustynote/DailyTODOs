@@ -1,24 +1,35 @@
-# sv
+# Daily TODOs
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A fast, offline-first todo calendar. No backend, no account, no tracking — everything runs in your browser and is saved to `localStorage` on your device.
 
-## Creating a project
+Live at [dailytodo.work](https://dailytodo.work).
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Features
 
-```sh
-# create a new project in the current directory
-npx sv create
+- Add, complete, and remove todos
+- Drag and drop to reorder todos or move them to a different day
+- URLs in a todo are auto-linked; image URLs are embedded inline
+- Hide weekends to declutter the calendar
+- Choose the start of the week (Saturday, Sunday, or Monday)
+- Import/export your todos as a JSON file
+- Clean up (wipe) all stored data from Settings
+- Light and dark theme
+- Month, week, and day calendar views
+- Installable, offline-capable PWA
 
-# create a new project in my-app
-npx sv create my-app
-```
+## Tech stack
+
+- [SvelteKit](https://svelte.dev/docs/kit) (Svelte 5) with `adapter-static` — the whole app is prerendered to static files, no server required
+- [Tailwind CSS](https://tailwindcss.com/) v4
+- [Pragmatic drag and drop](https://atlassian.design/components/pragmatic-drag-and-drop) for reordering todos
+- A service worker for precaching and offline support
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Install dependencies, then start a dev server:
 
 ```sh
+npm install
 npm run dev
 
 # or start the server and open the app in a new browser tab
@@ -27,12 +38,20 @@ npm run dev -- --open
 
 ## Building
 
-To create a production version of your app:
+Build a production version of the app:
 
 ```sh
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+This produces a fully static site in `build/` (SSR is disabled and every route is prerendered), so it can be hosted on any static file host. Preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+## Deployment
+
+Pushes to `master` are automatically built and deployed to GitHub Pages via [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+## Type checking
+
+```sh
+npm run check
+```

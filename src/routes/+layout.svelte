@@ -1,12 +1,23 @@
 <script lang="ts">
 	import '../app.css';
-	import favicon from '$lib/assets/favicon.svg';
-	
-	let { children } = $props();
-</script>
+	import {settings} from '$lib/settings';
+	import {onMount} from 'svelte';
 
-<svelte:head>
-<!--	<link rel="icon" href={favicon} />-->
-</svelte:head>
+	let { children } = $props();
+
+	$effect(() => {
+		if($settings.isDark) {
+			document.documentElement.classList.add('dark');
+		} else {
+			document.documentElement.classList.remove('dark');
+		}
+	});
+
+	onMount(() => {
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('/service-worker.js', {type: 'module'});
+		}
+	});
+</script>
 
 {@render children?.()}
