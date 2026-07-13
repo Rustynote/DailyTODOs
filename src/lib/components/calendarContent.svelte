@@ -2,8 +2,8 @@
 
 <script lang="ts">
 	import {settings} from "$lib/settings";
-	import {currentDate, selectedDate, weekDaysShortRaw, today} from "$lib/vars";
-	import {startOfWeek, endOfWeek, startOfMonthGrid, endOfMonthGrid, daysInWeek, rangeDays} from "$lib/calendar.svelte";
+	import {currentDate, selectedDate, today, weekStartDayIndex} from "$lib/vars";
+	import {startOfWeek, endOfWeek, startOfMonthGrid, endOfMonthGrid, daysInWeek, rangeDays, weekDayLabels} from "$lib/calendar.svelte";
 	import {formatDate} from "$lib/date";
 	import {todos} from "$lib/todos.svelte";
 	import {dropColumn, dropGhost, dragPreview, draggingTodo, startDragMonitor} from "$lib/dnd";
@@ -12,8 +12,12 @@
 	// Number of columns in the grid: 5 when weekends are hidden, otherwise 7.
 	let diw = $derived(daysInWeek($settings.hideWeekend));
 
-	// Weekday header labels, trimmed to weekdays only when weekends are hidden.
-	let weekDaysShort = $derived($settings.hideWeekend ? weekDaysShortRaw.slice(0, 5) : weekDaysShortRaw);
+	// Day index (0=Sunday ... 6=Saturday) the week starts on, per settings.
+	let weekStartDay = $derived(weekStartDayIndex[$settings.weekStart] ?? 1);
+
+	// Weekday header labels, starting at weekStartDay and trimmed to weekdays
+	// only when weekends are hidden.
+	let weekDaysShort = $derived(weekDayLabels(weekStartDay, $settings.hideWeekend));
 
 	let monthDays: Date[] = $state([]);
 	let monthRows: number = $state(0);
@@ -22,28 +26,29 @@
 	let weekDays: Date[] = $state([]);
 
 	// Recompute the full set of days shown in the month grid whenever the
-	// displayed month, view, or weekend visibility changes.
+	// displayed month, view, weekend visibility, or week-start day changes.
 	$effect(() => {
-		monthDays = rangeDays(startOfMonthGrid($currentDate), endOfMonthGrid($currentDate), $currentDate, $settings.view, $settings.hideWeekend);
+		monthDays = rangeDays(startOfMonthGrid($currentDate, weekStartDay), endOfMonthGrid($currentDate, weekStartDay), $currentDate, $settings.view, $settings.hideWeekend, weekStartDay);
 	});
 	// Derive the number of grid rows needed to fit all month days, used to
 	// size the CSS grid via the `--month-rows` custom property.
 	$effect(() => {
 		monthRows = Math.floor(monthDays.length / diw);
 	});
-	// Recompute the visible week's start day whenever the selected day changes.
+	// Recompute the visible week's start day whenever the selected day or
+	// week-start day changes.
 	$effect(() => {
-		weekStart = startOfWeek($selectedDate);
+		weekStart = startOfWeek($selectedDate, weekStartDay);
 	});
 	// Recompute the visible week's end day whenever the selected day or
-	// weekend visibility changes.
+	// week-start day changes.
 	$effect(() => {
-		weekEnd = endOfWeek($selectedDate, $settings.hideWeekend);
+		weekEnd = endOfWeek($selectedDate, weekStartDay);
 	});
 	// Recompute the full set of days shown in the week grid whenever its
-	// range, view, or weekend visibility changes.
+	// range, view, weekend visibility, or week-start day changes.
 	$effect(() => {
-		weekDays = rangeDays(weekStart, weekEnd, $currentDate, $settings.view, $settings.hideWeekend);
+		weekDays = rangeDays(weekStart, weekEnd, $currentDate, $settings.view, $settings.hideWeekend, weekStartDay);
 	});
 
 	// Single drop monitor for the whole calendar: resolves every todo drag

@@ -32,10 +32,23 @@ export const currentDate = writable(new Date(today));
 export const selectedDate = writable(new Date(today));
 
 /**
- * Short weekday labels, Monday-first, used as column headers in the
- * calendar grid.
- *
- * Note: this is the full 7-day list; components that hide weekends slice
- * it down to the first 5 entries.
+ * Short weekday labels indexed by JavaScript's `Date#getDay()` (0 = Sunday
+ * ... 6 = Saturday), used to build the calendar's weekday header regardless
+ * of which day the week is configured to start on.
  */
-export const weekDaysShortRaw: string[] = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+export const weekDayNames: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+/**
+ * Options offered by the "start of week" setting, in the order shown in the
+ * settings dropdown.
+ */
+export const weekStartOptions: string[] = ['saturday', 'sunday', 'monday'];
+
+/**
+ * Maps a `weekStartOptions` value to the corresponding `Date#getDay()` index.
+ */
+export const weekStartDayIndex: Record<string, number> = {
+    sunday: 0,
+    monday: 1,
+    saturday: 6
+};

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {settings} from '$lib/settings';
 	import {todos} from '$lib/todos.svelte';
+	import {weekStartOptions} from '$lib/vars';
 
 	let importError = $state('');
 
@@ -66,6 +67,16 @@
 
 	<h2 class="mt-20 mb-2 text-3xl">Weekends</h2>
 	<label><input type="checkbox" bind:checked={$settings.hideWeekend}> Hide weekends</label>
+
+	<h2 class="mt-20 mb-2 text-3xl">Start of Week</h2>
+	{#if $settings.hideWeekend}
+		<p class="mb-2 text-sm text-neutral-500 dark:text-neutral-400">Unavailable while weekends are hidden, since Saturday and Sunday are excluded either way.</p>
+	{/if}
+	<select bind:value={$settings.weekStart} disabled={$settings.hideWeekend} class="bg-neutral-100 dark:bg-neutral-800 border border-gray-200 dark:border-gray-600 rounded px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
+		{#each weekStartOptions as w}
+			<option value={w}>{w[0].toUpperCase() + w.slice(1)}</option>
+		{/each}
+	</select>
 
 	<h2 class="mt-20 mb-2 text-3xl">Import / Export</h2>
 	<p class="mb-4">Export your todos to a JSON file, or import a previously exported file. Importing replaces all current todos.</p>

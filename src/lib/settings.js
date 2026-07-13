@@ -12,7 +12,13 @@ const defaultSettings = {
      * If true, weekend days are hidden in the calendar UI.
      */
     hideWeekend: true,
-    
+
+    /**
+     * Day the calendar week starts on.
+     * One of the values in `$lib/vars`' `weekStartOptions`.
+     */
+    weekStart: 'monday',
+
     /**
      * If true, completed items are still shown.
      */
