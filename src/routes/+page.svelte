@@ -12,7 +12,8 @@
 		SunMoon,
 		LayoutGrid,
 		Download,
-		ServerOff
+		ServerOff,
+		MonitorSmartphone
 	} from '@lucide/svelte';
 
 	const stack = [
@@ -75,6 +76,11 @@
 			icon: LayoutGrid,
 			title: 'Month, week & day views',
 			description: 'Zoom out for the big picture or zoom in on today — switch views in one click.'
+		},
+		{
+			icon: MonitorSmartphone,
+			title: 'Synced across tabs',
+			description: 'Open the app in multiple tabs and your todos and settings stay in sync automatically.'
 		},
 		{
 			icon: Download,
