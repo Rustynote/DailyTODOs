@@ -8,7 +8,10 @@
 	import {todos} from "$lib/todos.svelte";
 	import ToDo from "./ToDo.svelte";
 
+	// Number of columns in the grid: 5 when weekends are hidden, otherwise 7.
 	let diw = $derived(daysInWeek($settings.hideWeekend));
+
+	// Weekday header labels, trimmed to weekdays only when weekends are hidden.
 	let weekDaysShort = $derived($settings.hideWeekend ? weekDaysShortRaw.slice(0, 5) : weekDaysShortRaw);
 
 	let monthDays: Date[] = $state([]);
@@ -16,18 +19,28 @@
 	let weekStart: Date = $state(today);
 	let weekEnd: Date = $state(today);
 	let weekDays: Date[] = $state([]);
+
+	// Recompute the full set of days shown in the month grid whenever the
+	// displayed month, view, or weekend visibility changes.
 	$effect(() => {
 		monthDays = rangeDays(startOfMonthGrid($currentDate), endOfMonthGrid($currentDate), $currentDate, $settings.view, $settings.hideWeekend);
 	});
+	// Derive the number of grid rows needed to fit all month days, used to
+	// size the CSS grid via the `--month-rows` custom property.
 	$effect(() => {
 		monthRows = Math.floor(monthDays.length / diw);
 	});
+	// Recompute the visible week's start day whenever the selected day changes.
 	$effect(() => {
 		weekStart = startOfWeek($selectedDate);
 	});
+	// Recompute the visible week's end day whenever the selected day or
+	// weekend visibility changes.
 	$effect(() => {
 		weekEnd = endOfWeek($selectedDate, $settings.hideWeekend);
 	});
+	// Recompute the full set of days shown in the week grid whenever its
+	// range, view, or weekend visibility changes.
 	$effect(() => {
 		weekDays = rangeDays(weekStart, weekEnd, $currentDate, $settings.view, $settings.hideWeekend);
 	});

@@ -4,6 +4,9 @@
     import {ArrowBigLeft, ArrowBigRight, RefreshCcw, Eye, EyeOff} from '@lucide/svelte';
     import {views, today, currentDate, selectedDate} from "$lib/vars";
 
+    /**
+     * Reset both the displayed month/period and the selected day back to today.
+     */
     function reset() {
         $currentDate = new Date(today);
 
@@ -11,6 +14,15 @@
     }
 
     // --- Navigation ---
+
+    /**
+     * Move the calendar one step backward.
+     *
+     * The step size depends on the active view:
+     * - month: previous calendar month
+     * - week: 7 days earlier
+     * - day: 1 day earlier
+     */
     function prev() {
         if($settings.view === 'month') {
             $currentDate = new Date($currentDate.getFullYear(), $currentDate.getMonth() - 1, 1)
@@ -25,6 +37,14 @@
         }
     }
 
+    /**
+     * Move the calendar one step forward.
+     *
+     * The step size depends on the active view:
+     * - month: next calendar month
+     * - week: 7 days later
+     * - day: 1 day later
+     */
     function next() {
         if($settings.view === 'month') {
             $currentDate = new Date($currentDate.getFullYear(), $currentDate.getMonth() + 1, 1)
