@@ -13,7 +13,8 @@
 		LayoutGrid,
 		Download,
 		ServerOff,
-		MonitorSmartphone
+		MonitorSmartphone,
+		Github
 	} from '@lucide/svelte';
 
 	const stack = [
@@ -93,6 +94,24 @@
 <svelte:head>
 	<title>Daily TODOs - Fast, offline todo calendar</title>
 	<meta name="description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data.">
+	<meta name="robots" content="index, follow">
+	<link rel="canonical" href="https://dailytodo.work/">
+
+	<!-- Open Graph -->
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://dailytodo.work/">
+	<meta property="og:site_name" content="Daily TODOs">
+	<meta property="og:title" content="Daily TODOs - Fast, offline todo calendar">
+	<meta property="og:description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data.">
+	<meta property="og:image" content="https://dailytodo.work/icons/icon-512.png">
+	<meta property="og:image:width" content="512">
+	<meta property="og:image:height" content="512">
+
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Daily TODOs - Fast, offline todo calendar">
+	<meta name="twitter:description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data.">
+	<meta name="twitter:image" content="https://dailytodo.work/icons/icon-512.png">
 </svelte:head>
 
 <div class="min-h-screen bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
@@ -104,6 +123,9 @@
 		</div>
 
 		<div class="flex items-center gap-2">
+			<a href="https://github.com/Rustynote/DailyTODOs" target="_blank" rel="noopener noreferrer" class="rounded px-2 py-1 text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white" title="View on GitHub">
+				<Github size={20}/>
+			</a>
 			<button
 					onclick={() => $settings.isDark = !$settings.isDark}
 					class="cursor-pointer rounded px-2 py-1 text-lg"
@@ -184,5 +206,6 @@
 	<!-- Footer -->
 	<footer class="border-t border-neutral-200 py-8 text-center text-sm text-neutral-500 dark:border-neutral-800 dark:text-neutral-500">
 		<p>© {new Date().getFullYear()} Daily TODOs</p>
+		<p class="mt-1">Made by <a href="https://wparcanum.com/" target="_blank" rel="noopener" class="underline hover:text-neutral-700 dark:hover:text-neutral-300">Jaroslav Suhanek</a></p>
 	</footer>
 </div>
