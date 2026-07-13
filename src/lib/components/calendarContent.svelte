@@ -84,9 +84,9 @@
 		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-900 text-center flex-1 min-h-0 grid-rows-[repeat(var(--month-rows),1fr)]" style="--month-rows: {monthRows}">
 			{#each monthDays as d}
 				{#key formatDate(d)}
-					<div class="pb-[35px] relative flex flex-col {d.getMonth()!==$currentDate.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
+					<div class="pb-[35px] relative flex flex-col min-h-0 {d.getMonth()!==$currentDate.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-900 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<div class="flex flex-col px-2 h-[100%] overflow-y-auto" use:dropColumn={formatDate(d)}>
+						<div class="flex flex-col px-2 h-[100%] min-h-0 overflow-y-auto" use:dropColumn={formatDate(d)}>
 							{#each todos.onDay(d) as todo (todo.id)}
 								{#if previewAt(formatDate(d), todo.id, 'before')}
 									{@render dropIndicator()}
@@ -119,9 +119,9 @@
 		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-800 text-center flex-1 min-h-0 grid-rows-1">
 			{#each weekDays as d}
 				{#key formatDate(d)}
-					<div class="pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-900">
+					<div class="pb-[35px] relative flex flex-col min-h-0 border border-neutral-200 dark:border-neutral-900">
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto" use:dropColumn={formatDate(d)}>
+						<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto" use:dropColumn={formatDate(d)}>
 							{#each todos.onDay(d) as todo (todo.id)}
 								{#if previewAt(formatDate(d), todo.id, 'before')}
 									{@render dropIndicator()}
@@ -148,7 +148,7 @@
 	{:else}
 		<div class="day flex-1 min-h-0">
 			<div class="h-full pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-800">
-				<div class="flex flex-col pt-2 px-2 h-[100%] overflow-y-auto" use:dropColumn={formatDate($selectedDate)}>
+				<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto" use:dropColumn={formatDate($selectedDate)}>
 					{#each todos.onDay($selectedDate) as todo (todo.id)}
 						{#if previewAt(formatDate($selectedDate), todo.id, 'before')}
 							{@render dropIndicator()}

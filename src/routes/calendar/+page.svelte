@@ -27,16 +27,16 @@
     }
 
     /* Webkit scrollbar styles */
-    ::-webkit-scrollbar {
+    :global(::-webkit-scrollbar) {
         width: 12px;
         height: 12px;
     }
 
-    ::-webkit-scrollbar-track {
+    :global(::-webkit-scrollbar-track) {
         background: var(--scrollbar-track-color);
     }
 
-    ::-webkit-scrollbar-thumb {
+    :global(::-webkit-scrollbar-thumb) {
         background-color: var(--scrollbar-thumb-color);
         border-radius: 10px;
         border: 2px solid var(--scrollbar-track-color);
