@@ -69,6 +69,41 @@
 	function previewAt(date: string, targetId: string | null, position: 'before' | 'after') {
 		return $dragPreview !== null && $dragPreview.date === date && $dragPreview.targetId === targetId && $dragPreview.position === position;
 	}
+
+	/**
+	 * Whether a todo's edit textarea was focused right before the current
+	 * container click. Captured on `mousedown`, since focus already moves
+	 * away from the textarea (triggering its blur/save) before `click` fires,
+	 * so by the time `onContainerClick` runs it's too late to tell.
+	 */
+	let wasEditingBeforeClick = false;
+
+	/**
+	 * Record whether a todo was mid-edit before this click shifts focus away
+	 * from it.
+	 *
+	 * @param e Mousedown event from the todo-list container.
+	 */
+	function onContainerMouseDown(e: MouseEvent) {
+		wasEditingBeforeClick = document.activeElement instanceof HTMLTextAreaElement && document.activeElement.id.startsWith('todo-');
+	}
+
+	/**
+	 * Add a new todo for `d` when the day's todo-list container is clicked
+	 * directly, rather than via a bubbled click from a child element (an
+	 * existing todo, a link, etc). If a todo was being edited, the click
+	 * instead just unfocuses it (its own blur handler already saves and
+	 * exits edit mode) rather than also creating a new item.
+	 *
+	 * @param e Click event from the todo-list container.
+	 * @param d Date of the day being clicked.
+	 */
+	function onContainerClick(e: MouseEvent, d: Date) {
+		if(e.target !== e.currentTarget) return;
+		if(wasEditingBeforeClick) return;
+
+		todos.add(d);
+	}
 </script>
 
 {#snippet dropIndicator()}
@@ -89,9 +124,10 @@
 		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-900 text-center flex-1 min-h-0 grid-rows-[repeat(var(--month-rows),1fr)]" style="--month-rows: {monthRows}">
 			{#each monthDays as d}
 				{#key formatDate(d)}
-					<div class="pb-[35px] relative flex flex-col min-h-0 {d.getMonth()!==$currentDate.getMonth() && 'bg-neutral-200 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
+					<div class="pb-[35px] relative flex flex-col min-h-0 {d.getMonth()!==$currentDate.getMonth() && 'bg-neutral-300 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-900 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<div class="flex flex-col px-2 h-[100%] min-h-0 overflow-y-auto" use:dropColumn={formatDate(d)}>
+						<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
+						<div class="flex flex-col px-2 h-[100%] min-h-0 overflow-y-auto cursor-pointer" use:dropColumn={formatDate(d)} onmousedown={onContainerMouseDown} onclick={(e) => onContainerClick(e, d)}>
 							{#each todos.onDay(d) as todo (todo.id)}
 								{#if previewAt(formatDate(d), todo.id, 'before')}
 									{@render dropIndicator()}
@@ -105,7 +141,7 @@
 								{@render dropIndicator()}
 							{/if}
 						</div>
-						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 select-none" onclick={
+						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 select-none" onclick={
 							() => {
                                 todos.add(d)
 							}}>
@@ -126,7 +162,8 @@
 				{#key formatDate(d)}
 					<div class="pb-[35px] relative flex flex-col min-h-0 border border-neutral-200 dark:border-neutral-900">
 						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto" use:dropColumn={formatDate(d)}>
+						<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
+						<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto cursor-pointer" use:dropColumn={formatDate(d)} onmousedown={onContainerMouseDown} onclick={(e) => onContainerClick(e, d)}>
 							{#each todos.onDay(d) as todo (todo.id)}
 								{#if previewAt(formatDate(d), todo.id, 'before')}
 									{@render dropIndicator()}
@@ -140,7 +177,7 @@
 								{@render dropIndicator()}
 							{/if}
 						</div>
-						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 select-none" onclick={
+						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 select-none" onclick={
 						() => {
 							todos.add(d)
 						}}>
@@ -153,7 +190,8 @@
 	{:else}
 		<div class="day flex-1 min-h-0">
 			<div class="h-full pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-800">
-				<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto" use:dropColumn={formatDate($selectedDate)}>
+				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
+				<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto cursor-pointer" use:dropColumn={formatDate($selectedDate)} onmousedown={onContainerMouseDown} onclick={(e) => onContainerClick(e, $selectedDate)}>
 					{#each todos.onDay($selectedDate) as todo (todo.id)}
 						{#if previewAt(formatDate($selectedDate), todo.id, 'before')}
 							{@render dropIndicator()}
@@ -167,7 +205,7 @@
 						{@render dropIndicator()}
 					{/if}
 				</div>
-				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-200 dark:bg-neutral-900 hover:bg-neutral-300 dark:hover:bg-neutral-950 select-none" onclick={
+				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 select-none" onclick={
 					() => {
 						todos.add($selectedDate)
 					}}>
