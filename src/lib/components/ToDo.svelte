@@ -92,6 +92,21 @@
     const focusElement = (node: HTMLElement) => {
         node.focus();
     };
+
+    /**
+     * Exit edit mode when the textarea loses focus, discarding the todo
+     * entirely if its title was left blank rather than persisting an
+     * empty item.
+     *
+     * @param e Focusout event from the edit textarea.
+     */
+    const onEditBlur = (e: FocusEvent & { currentTarget: HTMLTextAreaElement }) => {
+        todos.edit(null);
+
+        if(e.currentTarget.value.trim() === '') {
+            todos.delete(todo);
+        }
+    };
 </script>
 
 <!--
@@ -104,7 +119,7 @@
 -->
 <div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 {todos.isEditCurrent(todo) ? 'bg-neutral-200 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}{todo.done ? ' line-through opacity-70' : ''}" use:dragCard={todo} use:dropCard={todo} title="Drag to move">
 	{#if todos.isEditCurrent(todo)}
-		<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={() => todos.edit(null)} onchange={(e: Event & { currentTarget: HTMLTextAreaElement }) => todos.update(todo, e.currentTarget.value)}>{todo.title}</textarea>
+		<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={onEditBlur} onchange={(e: Event & { currentTarget: HTMLTextAreaElement }) => todos.update(todo, e.currentTarget.value)}>{todo.title}</textarea>
 	{:else}
 		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
 		<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words {isEditable ? 'cursor-text' : 'cursor-pointer'}" onclick={() => isEditable && todos.edit(todo)}>
