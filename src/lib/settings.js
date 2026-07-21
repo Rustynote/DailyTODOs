@@ -42,8 +42,11 @@ const defaultSettings = {
      * Important: this is only the initial value. If you want the app to react
      * to OS theme changes while running, you'll need to add a listener to the
      * MediaQueryList and update the store accordingly.
+     *
+     * Falls back to `false` when there's no `window` (e.g. the root route is
+     * SSR-prerendered so its <svelte:head> tags land in the static HTML).
      */
-    isDark: window.matchMedia('(prefers-color-scheme: dark)').matches
+    isDark: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
 };
 
 /**
@@ -87,8 +90,14 @@ let initSettings = defaultSettings;
 /**
  * Read any previously persisted settings from localStorage.
  * localStorage stores strings, so we parse JSON back into an object.
+ *
+ * Guarded on `window` rather than `localStorage` directly: some SSR
+ * environments (e.g. newer Node) expose a non-functional global
+ * `localStorage` stub, so checking `window` is the reliable "are we in a
+ * browser" check. SSR happens for the root route so its <svelte:head> tags
+ * land in the static HTML.
  */
-const storedSettings = localStorage.getItem(LS_KEY);
+const storedSettings = typeof window !== 'undefined' ? localStorage.getItem(LS_KEY) : null;
 if (storedSettings) {
     try {
         initSettings = mergeWithDefaults(JSON.parse(storedSettings));
@@ -117,7 +126,9 @@ export const settings = writable(initSettings);
  *
  */
 settings.subscribe(value => {
-    localStorage.setItem(LS_KEY, JSON.stringify(value));
+    if (typeof window !== 'undefined') {
+        localStorage.setItem(LS_KEY, JSON.stringify(value));
+    }
 });
 
 /**
@@ -128,12 +139,14 @@ settings.subscribe(value => {
  * `key` is `null` when another tab calls `localStorage.clear()` (see the
  * "Remove Data" setting), in which case we fall back to defaults.
  */
-window.addEventListener('storage', (e) => {
-    if (e.key !== null && e.key !== LS_KEY) return;
+if (typeof window !== 'undefined') {
+    window.addEventListener('storage', (e) => {
+        if (e.key !== null && e.key !== LS_KEY) return;
 
-    try {
-        settings.set(e.newValue ? mergeWithDefaults(JSON.parse(e.newValue)) : defaultSettings);
-    } catch (err) {
-        console.error('Failed to sync settings from another tab', err);
-    }
-});
+        try {
+            settings.set(e.newValue ? mergeWithDefaults(JSON.parse(e.newValue)) : defaultSettings);
+        } catch (err) {
+            console.error('Failed to sync settings from another tab', err);
+        }
+    });
+}
