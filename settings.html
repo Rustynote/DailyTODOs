@@ -2,6 +2,18 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<script>
+			(function () {
+				try {
+					var stored = localStorage.getItem('settings');
+					var isDark = stored ? JSON.parse(stored).isDark : undefined;
+					if (isDark === undefined) {
+						isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+					}
+					if (isDark) document.documentElement.classList.add('dark');
+				} catch (e) {}
+			})();
+		</script>
 		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="theme-color" content="#4f46e5" />
 		<meta name="mobile-web-app-capable" content="yes" />
@@ -12,30 +24,30 @@
 		<link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
 		<link rel="apple-touch-icon" href="/icons/icon-180.png" />
 		
-		<link rel="modulepreload" href="./_app/immutable/entry/start.C_pLTTbG.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/CNjHBy1L.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/CBiiDmej.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/CuIhlWBA.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/BNxSBtyn.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.8-JGP2X6.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.BLjEJw9S.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/V3b61sPh.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/BlYH-b-X.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/TkzSM1eQ.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/BY3cHNk-.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.N-9hMKG9.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/DsnmJJEf.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/ChjwNRVQ.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/CGep9kZW.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/D_lhUC-M.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/CQvuErTl.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/GIQ6mF2h.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/Bxz3xEho.js">
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
 			<script>
 				{
-					__sveltekit_192z31x = {
+					__sveltekit_1bxjf7h = {
 						base: new URL(".", location).pathname.slice(0, -1)
 					};
 
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("./_app/immutable/entry/start.C_pLTTbG.js"),
-						import("./_app/immutable/entry/app.8-JGP2X6.js")
+						import("./_app/immutable/entry/start.BLjEJw9S.js"),
+						import("./_app/immutable/entry/app.N-9hMKG9.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element);
 					});
