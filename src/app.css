@@ -6,3 +6,11 @@ html,
 body {
 	@apply bg-white dark:bg-neutral-950;
 }
+
+.icon-btn {
+	@apply cursor-pointer hover:text-neutral-500 dark:hover:text-neutral-200;
+}
+
+.icon-btn-muted {
+	@apply cursor-pointer text-neutral-400 dark:text-neutral-600 hover:text-neutral-600 dark:hover:text-neutral-300;
+}

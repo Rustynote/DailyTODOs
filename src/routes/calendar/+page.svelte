@@ -20,7 +20,8 @@
     }
 
     :global(html.dark) {
-        @apply bg-zinc-800 text-white transition-colors;
+        @apply bg-zinc-800 transition-colors;
+        color: oklch(0.95 0.006 55);
 
         --scrollbar-track-color: #1a1a1a;
         --scrollbar-thumb-color: #525252;
