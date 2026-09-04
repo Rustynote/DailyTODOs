@@ -6,11 +6,15 @@
 			(function () {
 				try {
 					var stored = localStorage.getItem('settings');
-					var isDark = stored ? JSON.parse(stored).isDark : undefined;
+					var parsed = stored ? JSON.parse(stored) : {};
+
+					var isDark = parsed.isDark;
 					if (isDark === undefined) {
 						isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 					}
 					if (isDark) document.documentElement.classList.add('dark');
+
+					document.documentElement.dataset.theme = parsed.theme || 'neutral';
 				} catch (e) {}
 			})();
 		</script>
@@ -24,23 +28,22 @@
 		<link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
 		<link rel="apple-touch-icon" href="/icons/icon-180.png" />
 		
-		<link href="./_app/immutable/assets/0.BPTNmpyr.css" rel="stylesheet">
-		<link rel="modulepreload" href="./_app/immutable/entry/start.BLjEJw9S.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/V3b61sPh.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/BlYH-b-X.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/TkzSM1eQ.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/BY3cHNk-.js">
-		<link rel="modulepreload" href="./_app/immutable/entry/app.N-9hMKG9.js">
+		<link href="./_app/immutable/assets/0.DIrZ2mgE.css" rel="stylesheet">
+		<link rel="modulepreload" href="./_app/immutable/entry/start.B9D9780f.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/B094KavQ.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/3WNLC60c.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/Co2DUFcy.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/C33eYx3Y.js">
+		<link rel="modulepreload" href="./_app/immutable/entry/app.D3dM7EFV.js">
 		<link rel="modulepreload" href="./_app/immutable/chunks/DsnmJJEf.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/CQvuErTl.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/GIQ6mF2h.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/Bxz3xEho.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/0.B44tZ-3P.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/BLBlEQHJ.js">
-		<link rel="modulepreload" href="./_app/immutable/nodes/2.JmssXvdL.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/BsOJWaHe.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/CaXHeOEV.js">
-		<link rel="modulepreload" href="./_app/immutable/chunks/Bas2KFh7.js"><!--[--><meta name="description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data."/> <meta name="robots" content="index, follow"/> <link rel="canonical" href="https://dailytodo.work/"/> <meta property="og:type" content="website"/> <meta property="og:url" content="https://dailytodo.work/"/> <meta property="og:site_name" content="Daily TODOs"/> <meta property="og:title" content="Daily TODOs - Fast, offline todo calendar"/> <meta property="og:description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data."/> <meta property="og:image" content="https://dailytodo.work/og-banner.png"/> <meta property="og:image:width" content="1200"/> <meta property="og:image:height" content="630"/> <meta name="twitter:card" content="summary_large_image"/> <meta name="twitter:title" content="Daily TODOs - Fast, offline todo calendar"/> <meta name="twitter:description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data."/> <meta name="twitter:image" content="https://dailytodo.work/og-banner.png"/> <script type="application/ld+json">
+		<link rel="modulepreload" href="./_app/immutable/chunks/CLLrP6JT.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/BLXQFO6-.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/DIKQJ_ic.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/0.Pdzlv85m.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/B1gGwIEf.js">
+		<link rel="modulepreload" href="./_app/immutable/nodes/2.BGCimj9G.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/CgS190vx.js">
+		<link rel="modulepreload" href="./_app/immutable/chunks/BqwKqMwN.js"><!--[--><meta name="description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data."/> <meta name="robots" content="index, follow"/> <link rel="canonical" href="https://dailytodo.work/"/> <meta property="og:type" content="website"/> <meta property="og:url" content="https://dailytodo.work/"/> <meta property="og:site_name" content="Daily TODOs"/> <meta property="og:title" content="Daily TODOs - Fast, offline todo calendar"/> <meta property="og:description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data."/> <meta property="og:image" content="https://dailytodo.work/og-banner.png"/> <meta property="og:image:width" content="1200"/> <meta property="og:image:height" content="630"/> <meta name="twitter:card" content="summary_large_image"/> <meta name="twitter:title" content="Daily TODOs - Fast, offline todo calendar"/> <meta name="twitter:description" content="A lightweight, backend-free daily planner with draggable todos, flexible views, weekend hiding, and portable data."/> <meta name="twitter:image" content="https://dailytodo.work/og-banner.png"/> <script type="application/ld+json">
 	{
 		"@context": "https://schema.org",
 		"@type": "WebApplication",
@@ -62,15 +65,15 @@
 			
 			<script>
 				{
-					__sveltekit_1bxjf7h = {
+					__sveltekit_u9ppvf = {
 						base: new URL(".", location).pathname.slice(0, -1)
 					};
 
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("./_app/immutable/entry/start.BLjEJw9S.js"),
-						import("./_app/immutable/entry/app.N-9hMKG9.js")
+						import("./_app/immutable/entry/start.B9D9780f.js"),
+						import("./_app/immutable/entry/app.D3dM7EFV.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element, {
 							node_ids: [0, 2],
