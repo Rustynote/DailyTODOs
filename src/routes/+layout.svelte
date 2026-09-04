@@ -13,6 +13,10 @@
 		}
 	});
 
+	$effect(() => {
+		document.documentElement.dataset.theme = $settings.theme;
+	});
+
 	onMount(() => {
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register('/service-worker.js', {type: 'module'});

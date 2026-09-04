@@ -46,7 +46,13 @@ const defaultSettings = {
      * Falls back to `false` when there's no `window` (e.g. the root route is
      * SSR-prerendered so its <svelte:head> tags land in the static HTML).
      */
-    isDark: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+    isDark: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches,
+
+    /**
+     * Color family the app's semantic color tokens are re-mapped onto.
+     * One of the values in `$lib/vars`' `themeOptions`.
+     */
+    theme: 'neutral'
 };
 
 /**

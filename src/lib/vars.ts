@@ -45,6 +45,18 @@ export const weekDayNames: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri',
 export const weekStartOptions: string[] = ['saturday', 'sunday', 'monday'];
 
 /**
+ * Options offered by the "theme" setting, in the order shown in the
+ * settings dropdown. Each name is a Tailwind gray-scale color family that
+ * the app's semantic color tokens (see app.css) are re-mapped onto.
+ */
+export const themeOptions: string[] = [
+    'slate', 'gray', 'zinc', 'neutral', 'stone',
+    'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald',
+    'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple',
+    'fuchsia', 'pink', 'rose'
+];
+
+/**
  * Maps a `weekStartOptions` value to the corresponding `Date#getDay()` index.
  */
 export const weekStartDayIndex: Record<string, number> = {

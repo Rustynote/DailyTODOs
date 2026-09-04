@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {settings} from '$lib/settings';
 	import {todos} from '$lib/todos.svelte';
-	import {weekStartOptions} from '$lib/vars';
+	import {weekStartOptions, themeOptions} from '$lib/vars';
 
 	let importError = $state('');
 
@@ -76,6 +76,13 @@
 		<select bind:value={$settings.weekStart} disabled={$settings.hideWeekend} class="bg-neutral-100 dark:bg-neutral-800 border border-gray-200 dark:border-gray-600 rounded px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed">
 			{#each weekStartOptions as w}
 				<option value={w}>{w[0].toUpperCase() + w.slice(1)}</option>
+			{/each}
+		</select>
+
+		<h2 class="mt-20 mb-2 text-3xl">Theme</h2>
+		<select bind:value={$settings.theme} class="bg-neutral-100 dark:bg-neutral-800 border border-gray-200 dark:border-gray-600 rounded px-3 py-2">
+			{#each themeOptions as t}
+				<option value={t}>{t[0].toUpperCase() + t.slice(1)}</option>
 			{/each}
 		</select>
 
