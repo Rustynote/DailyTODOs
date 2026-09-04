@@ -64,15 +64,15 @@
     @reference "tailwindcss";
 
     header {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
-        justify-content: space-between;
         @apply text-base;
     }
 </style>
 
 <header class="border-b-2 bg-header border-b-header-border px-2 py-1 shrink-0">
-	<div class="left select-none">
+	<div class="left justify-self-start select-none">
 		<button
 				onclick={() => $settings.isDark = !$settings.isDark}
 				class="px-1 py-1 rounded cursor-pointer"
@@ -86,7 +86,7 @@
 			{/if}
 		</button>
 	</div>
-	<div class="center flex mr-[-300px]">
+	<div class="center flex justify-self-center">
 		<button class="icon-btn px-1 py-1" onclick={prev} title="Previous" aria-label="Previous">
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
 		</button>
@@ -103,7 +103,7 @@
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
 		</button>
 	</div>
-	<div class="right flex items-center select-none">
+	<div class="right flex items-center justify-self-end select-none">
 		<button class="icon-btn mr-1 px-1 py-1" onclick={reset} title="Reset" aria-label="Reset">
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
 		</button>
