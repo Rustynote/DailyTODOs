@@ -2,6 +2,37 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/*
+ * Semantic color tokens. Each is a CSS variable so a shade only needs to
+ * change here — html.dark overrides the same variables for dark mode, so
+ * call sites (bg-surface, border-divider, ...) never need a `dark:` pair.
+ */
+@theme {
+	--color-surface: var(--color-neutral-200);
+	--color-surface-hover: var(--color-neutral-300);
+	--color-surface-strong: var(--color-neutral-300);
+	--color-divider: var(--color-neutral-200);
+	--color-icon-muted: var(--color-neutral-400);
+	--color-icon-muted-hover: var(--color-neutral-600);
+	--color-panel: var(--color-neutral-50);
+	--color-header: var(--color-neutral-100);
+	--color-header-border: var(--color-neutral-200);
+	--color-input-border: var(--color-neutral-200);
+}
+
+html.dark {
+	--color-surface: var(--color-neutral-900);
+	--color-surface-hover: var(--color-neutral-950);
+	--color-surface-strong: var(--color-neutral-900);
+	--color-divider: var(--color-neutral-900);
+	--color-icon-muted: var(--color-neutral-600);
+	--color-icon-muted-hover: var(--color-neutral-300);
+	--color-panel: var(--color-neutral-800);
+	--color-header: var(--color-neutral-800);
+	--color-header-border: var(--color-neutral-900);
+	--color-input-border: var(--color-neutral-700);
+}
+
 html,
 body {
 	@apply bg-white dark:bg-neutral-950;
@@ -12,5 +43,5 @@ body {
 }
 
 .icon-btn-muted {
-	@apply cursor-pointer text-neutral-400 dark:text-neutral-600 hover:text-neutral-600 dark:hover:text-neutral-300;
+	@apply cursor-pointer text-icon-muted hover:text-icon-muted-hover;
 }

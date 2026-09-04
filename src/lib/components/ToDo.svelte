@@ -117,7 +117,7 @@
     - applies strike-through and reduced opacity when the item is marked done
 -->
 <div class="group w-[100%] relative text-left rounded my-1 mb-2 {todos.isEditCurrent(todo) ? '' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" use:dragCard={todo} use:dropCard={todo} title="Drag to move">
-	<button class="absolute left-1 top-2 cursor-pointer flex items-center justify-center w-5 h-5 rounded-full border-2 border-neutral-400 dark:border-neutral-600 hover:border-neutral-600 dark:hover:border-neutral-300" title="Done" aria-label="Done" onclick={() => todos.done(todo, !todo.done)}>
+	<button class="absolute left-1 top-2 cursor-pointer flex items-center justify-center w-5 h-5 rounded-full border-2 border-icon-muted hover:border-icon-muted-hover" title="Done" aria-label="Done" onclick={() => todos.done(todo, !todo.done)}>
 		{#if todo.done}
 			<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
 				<polyline points="4 12 9 18 20 6"></polyline>
@@ -125,10 +125,10 @@
 		{/if}
 	</button>
 	{#if todos.isEditCurrent(todo)}
-		<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[34px] mr-[28px] p-2 outline-0 bg-neutral-200 dark:bg-neutral-950" oninput={autoGrow} onfocusin={autoGrow} onfocusout={onEditBlur} onchange={(e: Event & { currentTarget: HTMLTextAreaElement }) => todos.update(todo, e.currentTarget.value)}>{todo.title}</textarea>
+		<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[34px] mr-[28px] p-2 outline-0 bg-surface-hover" oninput={autoGrow} onfocusin={autoGrow} onfocusout={onEditBlur} onchange={(e: Event & { currentTarget: HTMLTextAreaElement }) => todos.update(todo, e.currentTarget.value)}>{todo.title}</textarea>
 	{:else}
 		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-		<div class="w-[calc(100%-60px)] min-h-6 ml-[34px] mr-[28px] break-words {isEditable ? 'cursor-text' : 'cursor-pointer'} p-2 bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950{todo.done ? ' line-through opacity-70' : ''}" onclick={() => isEditable && todos.edit(todo)}>
+		<div class="w-[calc(100%-60px)] min-h-6 ml-[34px] mr-[28px] break-words {isEditable ? 'cursor-text' : 'cursor-pointer'} p-2 bg-surface hover:bg-surface-hover{todo.done ? ' line-through opacity-70' : ''}" onclick={() => isEditable && todos.edit(todo)}>
 			{@html formatText(todo.title)}
 		</div>
 	{/if}

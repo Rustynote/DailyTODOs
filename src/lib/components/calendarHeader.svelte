@@ -71,7 +71,7 @@
     }
 </style>
 
-<header class="border-b-2 bg-neutral-100 border-b-neutral-200 dark:bg-zinc-800 dark:border-b-neutral-950 px-2 py-1 shrink-0">
+<header class="border-b-2 bg-header border-b-header-border px-2 py-1 shrink-0">
 	<div class="left select-none">
 		<button
 				onclick={() => $settings.isDark = !$settings.isDark}
@@ -105,21 +105,21 @@
 	</div>
 	<div class="right flex items-center select-none">
 		<button class="icon-btn mr-1 px-1 py-1" onclick={reset} title="Reset" aria-label="Reset">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 1 2.6 6.3"></path><polyline points="3 8 3 13 8 13"></polyline></svg>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
 		</button>
 		<button class="inline-flex items-end justify-center" onclick={() => { $settings.showDone = !$settings.showDone }} title={$settings.showDone ? 'Hide completed' : 'Show completed'} aria-label={$settings.showDone ? 'Hide completed' : 'Show completed'}>
 			{#if $settings.showDone}
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
 			{:else}
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19c-7 0-11-7-11-7a19 19 0 0 1 5-5.6M9.5 5.4A10 10 0 0 1 12 5c7 0 11 7 11 7a19 19 0 0 1-3 3.9M14.1 14.1a3 3 0 1 1-4.2-4.2"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"></path><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"></path><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"></path><path d="m2 2 20 20"></path></svg>
 			{/if}</button>
-		<select bind:value={$settings.view} class="bg-neutral-100 dark:bg-neutral-800 mx-2 select-none outline-0 border rounded-sm border-neutral-200 dark:border-neutral-700 px-0.5 py-1">
+		<select bind:value={$settings.view} class="bg-neutral-100 dark:bg-neutral-800 mx-2 select-none outline-0 border rounded-sm border-input-border px-0.5 py-1">
 			{#each views as w}
 				<option value={w}>{w}</option>
 			{/each}
 		</select>
 		<a href="/settings" title="Settings" aria-label="Settings">
-			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"></line><circle cx="9" cy="7" r="2.2"></circle><line x1="4" y1="12" x2="20" y2="12"></line><circle cx="16" cy="12" r="2.2"></circle><line x1="4" y1="17" x2="20" y2="17"></line><circle cx="10" cy="17" r="2.2"></circle></svg>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg>
 		</a>
 	</div>
 </header>
