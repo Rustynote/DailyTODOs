@@ -52,7 +52,7 @@ const defaultSettings = {
      * Color family the app's semantic color tokens are re-mapped onto.
      * One of the values in `$lib/vars`' `themeOptions`.
      */
-    theme: 'neutral'
+    theme: 'gray'
 };
 
 /**
@@ -155,4 +155,15 @@ if (typeof window !== 'undefined') {
             console.error('Failed to sync settings from another tab', err);
         }
     });
+}
+
+/**
+ * Reset settings back to their defaults.
+ *
+ * Used by the "Remove Data" setting so the UI updates immediately, without
+ * requiring a page reload. `settings.subscribe` already persists the new
+ * value to localStorage.
+ */
+export function resetSettings() {
+    settings.set(defaultSettings);
 }

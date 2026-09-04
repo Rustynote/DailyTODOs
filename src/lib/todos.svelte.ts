@@ -286,5 +286,17 @@ export const todos = {
         persist();
 
         return true;
+    },
+
+    /**
+     * Remove all todo items and clear their persisted storage.
+     *
+     * Unlike `delete`, this clears the whole list at once and is used by the
+     * "Remove Data" setting so the UI updates immediately, without requiring
+     * a page reload.
+     */
+    clear: () => {
+        items = [];
+        localStorage.removeItem(LS_KEY);
     }
 }

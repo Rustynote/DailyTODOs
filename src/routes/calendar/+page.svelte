@@ -1,6 +1,8 @@
 <script lang="ts">
     import CalendarHeader from '$lib/components/calendarHeader.svelte';
     import CalendarContent from '$lib/components/calendarContent.svelte';
+    import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+    import {isSettingsOpen} from '$lib/vars';
 </script>
 
 <style>
@@ -51,3 +53,6 @@
 
 <CalendarHeader/>
 <CalendarContent/>
+{#if $isSettingsOpen}
+	<SettingsPanel/>
+{/if}

@@ -50,10 +50,28 @@ export const weekStartOptions: string[] = ['saturday', 'sunday', 'monday'];
  * the app's semantic color tokens (see app.css) are re-mapped onto.
  */
 export const themeOptions: string[] = [
-    'slate', 'gray', 'zinc', 'neutral', 'stone',
-    'red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald',
-    'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple',
-    'fuchsia', 'pink', 'rose'
+    'amber',
+    'blue',
+    'cyan',
+    'emerald',
+    'fuchsia',
+    'gray',
+    'green',
+    'indigo',
+    'lime',
+    'neutral',
+    'orange',
+    'pink',
+    'purple',
+    'red',
+    'rose',
+    'sky',
+    'slate',
+    'stone',
+    'teal',
+    'violet',
+    'yellow',
+    'zinc',
 ];
 
 /**
@@ -64,3 +82,11 @@ export const weekStartDayIndex: Record<string, number> = {
     monday: 1,
     saturday: 6
 };
+
+/**
+ * Svelte store tracking whether the settings panel is open.
+ *
+ * The panel is rendered alongside the calendar rather than as a separate
+ * route, so this just toggles its visibility.
+ */
+export const isSettingsOpen = writable(false);

@@ -1,7 +1,7 @@
 <script lang="ts">
     import {settings} from '$lib/settings';
     import {monthName, weekNumber} from '$lib/date';
-    import {views, today, currentDate, selectedDate} from "$lib/vars";
+    import {views, today, currentDate, selectedDate, isSettingsOpen} from "$lib/vars";
 
     /**
      * Reset both the displayed month/period and the selected day back to today.
@@ -107,7 +107,7 @@
 		<button class="icon-btn mr-1 px-1 py-1" onclick={reset} title="Reset" aria-label="Reset">
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
 		</button>
-		<button class="inline-flex items-end justify-center" onclick={() => { $settings.showDone = !$settings.showDone }} title={$settings.showDone ? 'Hide completed' : 'Show completed'} aria-label={$settings.showDone ? 'Hide completed' : 'Show completed'}>
+		<button class="inline-flex items-end justify-center cursor-pointer" onclick={() => { $settings.showDone = !$settings.showDone }} title={$settings.showDone ? 'Hide completed' : 'Show completed'} aria-label={$settings.showDone ? 'Hide completed' : 'Show completed'}>
 			{#if $settings.showDone}
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>
 			{:else}
@@ -118,8 +118,8 @@
 				<option value={w}>{w}</option>
 			{/each}
 		</select>
-		<a href="/settings" title="Settings" aria-label="Settings">
+		<button class="icon-btn px-1 py-1" onclick={() => $isSettingsOpen = !$isSettingsOpen} title="Settings" aria-label="Settings" aria-pressed={$isSettingsOpen}>
 			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"></line><line x1="10" x2="3" y1="4" y2="4"></line><line x1="21" x2="12" y1="12" y2="12"></line><line x1="8" x2="3" y1="12" y2="12"></line><line x1="21" x2="16" y1="20" y2="20"></line><line x1="12" x2="3" y1="20" y2="20"></line><line x1="14" x2="14" y1="2" y2="6"></line><line x1="8" x2="8" y1="10" y2="14"></line><line x1="16" x2="16" y1="18" y2="22"></line></svg>
-		</a>
+		</button>
 	</div>
 </header>
