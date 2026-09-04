@@ -114,103 +114,74 @@
 	</div>
 {/snippet}
 
-<div class="calendar flex flex-col flex-1 min-h-0 bg-white dark:bg-neutral-800">
+{#snippet weekdayHeader()}
+	<div class="flex text-center shrink-0 select-none uppercase">
+		{#each weekDaysShort as weekDayShort}
+			<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-divider py-1">{weekDayShort}</div>
+		{/each}
+	</div>
+{/snippet}
+
+{#snippet dayColumn(d: Date)}
+	<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
+	<div class="flex flex-col pt-1 px-2 h-[100%] min-h-0 overflow-y-auto cursor-pointer" use:dropColumn={formatDate(d)} onmousedown={onContainerMouseDown} onclick={(e) => onContainerClick(e, d)}>
+		{#each todos.onDay(d) as todo (todo.id)}
+			{#if previewAt(formatDate(d), todo.id, 'before')}
+				{@render dropIndicator()}
+			{/if}
+			<ToDo todo={todo}/>
+			{#if previewAt(formatDate(d), todo.id, 'after')}
+				{@render dropIndicator()}
+			{/if}
+		{/each}
+		{#if previewAt(formatDate(d), null, 'after')}
+			{@render dropIndicator()}
+		{/if}
+	</div>
+{/snippet}
+
+{#snippet dayButton(d: Date)}
+	<button class="rounded-[50%] mt-1 mx-auto p-2 w-[35px] h-[35px] cursor-pointer transition hover:bg-surface-strong {$selectedDate.getTime() === d.getTime() ? ' bg-surface-strong': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
+{/snippet}
+
+{#snippet addTodoButton(d: Date)}
+	<button class="flex items-center justify-center absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-surface hover:bg-surface-hover select-none" onclick={() => todos.add(d)} title="Add todo" aria-label="Add todo">
+		<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+	</button>
+{/snippet}
+
+<div class="calendar flex flex-col flex-1 min-h-0 bg-panel text-sm">
 	{#if $settings.view === 'month'}
-		<div class="flex text-center shrink-0 select-none">
-			{#each weekDaysShort as weekDayShort}
-				<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
-			{/each}
-		</div>
-		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-900 text-center flex-1 min-h-0 grid-rows-[repeat(var(--month-rows),1fr)]" style="--month-rows: {monthRows}">
+		{@render weekdayHeader()}
+		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-divider text-center flex-1 min-h-0 grid-rows-[repeat(var(--month-rows),1fr)]" style="--month-rows: {monthRows}">
 			{#each monthDays as d}
 				{#key formatDate(d)}
-					<div class="pb-[35px] relative flex flex-col min-h-0 {d.getMonth()!==$currentDate.getMonth() && 'bg-neutral-300 dark:bg-neutral-950'} border border-neutral-200 dark:border-neutral-900">
-						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-900 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-900': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-						<div class="flex flex-col px-2 h-[100%] min-h-0 overflow-y-auto cursor-pointer" use:dropColumn={formatDate(d)} onmousedown={onContainerMouseDown} onclick={(e) => onContainerClick(e, d)}>
-							{#each todos.onDay(d) as todo (todo.id)}
-								{#if previewAt(formatDate(d), todo.id, 'before')}
-									{@render dropIndicator()}
-								{/if}
-								<ToDo todo={todo}/>
-								{#if previewAt(formatDate(d), todo.id, 'after')}
-									{@render dropIndicator()}
-								{/if}
-							{/each}
-							{#if previewAt(formatDate(d), null, 'after')}
-								{@render dropIndicator()}
-							{/if}
-						</div>
-						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 select-none" onclick={
-							() => {
-                                todos.add(d)
-							}}>
-							+
-						</button>
+					<div class="pb-[35px] relative flex flex-col min-h-0 {d.getMonth()!==$currentDate.getMonth() && 'bg-surface-strong'} border border-divider">
+						{@render dayButton(d)}
+						{@render dayColumn(d, false)}
+						{@render addTodoButton(d)}
 					</div>
 				{/key}
 			{/each}
 		</div>
 	{:else if $settings.view === 'week'}
-		<div class="flex text-center shrink-0 select-none">
-			{#each weekDaysShort as weekDayShort}
-				<div class="cursor-default border-b {$settings.hideWeekend ? 'w-[calc(100%/5)]' : 'w-[calc(100%/7)]'} border-x border-neutral-200 dark:border-neutral-900">{weekDayShort}</div>
-			{/each}
-		</div>
-		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-neutral-200 dark:divide-neutral-800 text-center flex-1 min-h-0 grid-rows-1">
+		{@render weekdayHeader()}
+		<div class="grid {$settings.hideWeekend ? 'grid-cols-5' : 'grid-cols-7'} divide-x divide-y divide-divider text-center flex-1 min-h-0 grid-rows-1">
 			{#each weekDays as d}
 				{#key formatDate(d)}
-					<div class="pb-[35px] relative flex flex-col min-h-0 border border-neutral-200 dark:border-neutral-900">
-						<button class="rounded-[50%] mt-1 mx-auto p-2 w-[40px] cursor-pointer transition hover:bg-neutral-300 dark:hover:bg-neutral-950 {$selectedDate.getTime() === d.getTime() ? ' bg-neutral-300 dark:bg-neutral-950': ''} select-none" onclick={() => $selectedDate = d}>{d.getDate()}</button>
-						<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-						<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto cursor-pointer" use:dropColumn={formatDate(d)} onmousedown={onContainerMouseDown} onclick={(e) => onContainerClick(e, d)}>
-							{#each todos.onDay(d) as todo (todo.id)}
-								{#if previewAt(formatDate(d), todo.id, 'before')}
-									{@render dropIndicator()}
-								{/if}
-								<ToDo todo={todo}/>
-								{#if previewAt(formatDate(d), todo.id, 'after')}
-									{@render dropIndicator()}
-								{/if}
-							{/each}
-							{#if previewAt(formatDate(d), null, 'after')}
-								{@render dropIndicator()}
-							{/if}
-						</div>
-						<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 select-none" onclick={
-						() => {
-							todos.add(d)
-						}}>
-							+
-						</button>
+					<div class="pb-[35px] relative flex flex-col min-h-0 border border-divider">
+						{@render dayButton(d)}
+						{@render dayColumn(d, true)}
+						{@render addTodoButton(d)}
 					</div>
 				{/key}
 			{/each}
 		</div>
 	{:else}
 		<div class="day flex-1 min-h-0">
-			<div class="h-full pb-[35px] relative flex flex-col border border-neutral-200 dark:border-neutral-800">
-				<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-				<div class="flex flex-col pt-2 px-2 h-[100%] min-h-0 overflow-y-auto cursor-pointer" use:dropColumn={formatDate($selectedDate)} onmousedown={onContainerMouseDown} onclick={(e) => onContainerClick(e, $selectedDate)}>
-					{#each todos.onDay($selectedDate) as todo (todo.id)}
-						{#if previewAt(formatDate($selectedDate), todo.id, 'before')}
-							{@render dropIndicator()}
-						{/if}
-						<ToDo todo={todo}/>
-						{#if previewAt(formatDate($selectedDate), todo.id, 'after')}
-							{@render dropIndicator()}
-						{/if}
-					{/each}
-					{#if previewAt(formatDate($selectedDate), null, 'after')}
-						{@render dropIndicator()}
-					{/if}
-				</div>
-				<button class="block absolute bottom-0 w-[100%] ml-n-1 py-1 cursor-pointer font-bold bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 select-none" onclick={
-					() => {
-						todos.add($selectedDate)
-					}}>
-					+
-				</button>
+			<div class="h-full pb-[35px] relative flex flex-col border border-divider">
+				{@render dayColumn($selectedDate, true)}
+				{@render addTodoButton($selectedDate)}
 			</div>
 		</div>
 	{/if}

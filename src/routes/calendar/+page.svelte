@@ -1,6 +1,8 @@
 <script lang="ts">
     import CalendarHeader from '$lib/components/calendarHeader.svelte';
     import CalendarContent from '$lib/components/calendarContent.svelte';
+    import SettingsPanel from '$lib/components/SettingsPanel.svelte';
+    import {isSettingsOpen} from '$lib/vars';
 </script>
 
 <style>
@@ -20,7 +22,8 @@
     }
 
     :global(html.dark) {
-        @apply bg-zinc-800 text-white transition-colors;
+        @apply bg-zinc-800 transition-colors;
+        color: oklch(0.95 0.006 55);
 
         --scrollbar-track-color: #1a1a1a;
         --scrollbar-thumb-color: #525252;
@@ -50,3 +53,6 @@
 
 <CalendarHeader/>
 <CalendarContent/>
+{#if $isSettingsOpen}
+	<SettingsPanel/>
+{/if}

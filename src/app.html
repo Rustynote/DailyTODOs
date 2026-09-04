@@ -6,11 +6,15 @@
 			(function () {
 				try {
 					var stored = localStorage.getItem('settings');
-					var isDark = stored ? JSON.parse(stored).isDark : undefined;
+					var parsed = stored ? JSON.parse(stored) : {};
+
+					var isDark = parsed.isDark;
 					if (isDark === undefined) {
 						isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 					}
 					if (isDark) document.documentElement.classList.add('dark');
+
+					document.documentElement.dataset.theme = parsed.theme || 'neutral';
 				} catch (e) {}
 			})();
 		</script>

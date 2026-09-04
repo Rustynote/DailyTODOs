@@ -45,6 +45,36 @@ export const weekDayNames: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri',
 export const weekStartOptions: string[] = ['saturday', 'sunday', 'monday'];
 
 /**
+ * Options offered by the "theme" setting, in the order shown in the
+ * settings dropdown. Each name is a Tailwind gray-scale color family that
+ * the app's semantic color tokens (see app.css) are re-mapped onto.
+ */
+export const themeOptions: string[] = [
+    'amber',
+    'blue',
+    'cyan',
+    'emerald',
+    'fuchsia',
+    'gray',
+    'green',
+    'indigo',
+    'lime',
+    'neutral',
+    'orange',
+    'pink',
+    'purple',
+    'red',
+    'rose',
+    'sky',
+    'slate',
+    'stone',
+    'teal',
+    'violet',
+    'yellow',
+    'zinc',
+];
+
+/**
  * Maps a `weekStartOptions` value to the corresponding `Date#getDay()` index.
  */
 export const weekStartDayIndex: Record<string, number> = {
@@ -52,3 +82,11 @@ export const weekStartDayIndex: Record<string, number> = {
     monday: 1,
     saturday: 6
 };
+
+/**
+ * Svelte store tracking whether the settings panel is open.
+ *
+ * The panel is rendered alongside the calendar rather than as a separate
+ * route, so this just toggles its visibility.
+ */
+export const isSettingsOpen = writable(false);

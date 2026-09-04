@@ -3,10 +3,9 @@
 <script lang="ts">
     import {todos} from '$lib/todos.svelte';
     import {settings} from "$lib/settings";
-    import {Check, X} from "@lucide/svelte";
     import {dragCard, dropCard} from "$lib/dnd";
 
-	/**
+    /**
      * Todo item passed into the component through Svelte props.
      *
      * This component is responsible for rendering a single todo entry,
@@ -15,7 +14,7 @@
     let {todo} = $props();
 
     /**
-	 * Controls whether the todo text can be switched into inline edit mode.
+     * Controls whether the todo text can be switched into inline edit mode.
      *
      * This is set to `false` when the formatted content contains embedded images,
      * because clicking the item should then behave like interacting with media
@@ -57,9 +56,9 @@
                     isEditable = false;
 
                     title = title.replace(url, '<a href="' + url + '" target="_blank"><img src="' + url + '" alt=""></a>');
-				} else {
+                } else {
                     title = title.replace(url, '<a class="cursor-text" href="' + url + '" onclick="event.preventDefault()">' + url + '</a>');
-				}
+                }
             }
         }
 
@@ -100,7 +99,7 @@
      *
      * @param e Focusout event from the edit textarea.
      */
-    const onEditBlur = (e: FocusEvent & { currentTarget: HTMLTextAreaElement }) => {
+    const onEditBlur = (e: FocusEvent & {currentTarget: HTMLTextAreaElement}) => {
         todos.edit(null);
 
         if(e.currentTarget.value.trim() === '') {
@@ -117,19 +116,26 @@
     - hides completed items when the relevant setting is disabled
     - applies strike-through and reduced opacity when the item is marked done
 -->
-<div class="group w-[100%] p-1 py-2 relative text-left rounded my-1 mb-2 bg-neutral-100 dark:bg-neutral-900 hover:bg-neutral-200 dark:hover:bg-neutral-950 {todos.isEditCurrent(todo) ? 'bg-neutral-200 dark:bg-neutral-950' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}{todo.done ? ' line-through opacity-70' : ''}" use:dragCard={todo} use:dropCard={todo} title="Drag to move">
+<div class="group w-[100%] relative text-left rounded my-1 mb-2 {todos.isEditCurrent(todo) ? '' : ''} {!$settings.showDone && todo.done ? 'hidden' : ''}" use:dragCard={todo} use:dropCard={todo} title="Drag to move">
+	<button class="absolute left-1 top-2 cursor-pointer flex items-center justify-center w-5 h-5 rounded-full border-2 border-icon-muted hover:border-icon-muted-hover" title="Done" aria-label="Done" onclick={() => todos.done(todo, !todo.done)}>
+		{#if todo.done}
+			<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+				<polyline points="4 12 9 18 20 6"></polyline>
+			</svg>
+		{/if}
+	</button>
 	{#if todos.isEditCurrent(todo)}
-		<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[10px] mr-[50px] outline-0" oninput={autoGrow} onfocusin={autoGrow} onfocusout={onEditBlur} onchange={(e: Event & { currentTarget: HTMLTextAreaElement }) => todos.update(todo, e.currentTarget.value)}>{todo.title}</textarea>
+		<textarea id="todo-{todo.id}" use:focusElement class="block resize-none w-[calc(100%-60px)] min-h-4 h-[24px] ml-[34px] mr-[28px] p-2 outline-0 bg-surface-hover" oninput={autoGrow} onfocusin={autoGrow} onfocusout={onEditBlur} onchange={(e: Event & { currentTarget: HTMLTextAreaElement }) => todos.update(todo, e.currentTarget.value)}>{todo.title}</textarea>
 	{:else}
 		<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions (because of reasons) -->
-		<div class="w-[calc(100%-60px)] min-h-6 ml-[10px] mr-[50px] break-words {isEditable ? 'cursor-text' : 'cursor-pointer'}" onclick={() => isEditable && todos.edit(todo)}>
+		<div class="w-[calc(100%-60px)] min-h-6 ml-[34px] mr-[28px] break-words {isEditable ? 'cursor-text' : 'cursor-pointer'} p-2 bg-surface hover:bg-surface-hover{todo.done ? ' line-through opacity-70' : ''}" onclick={() => isEditable && todos.edit(todo)}>
 			{@html formatText(todo.title)}
 		</div>
 	{/if}
-	<button class="absolute top-2 right-1 cursor-pointer hidden group-hover:block" title="Delete" onclick={() => todos.delete(todo)}>
-		<X size={20}/>
-	</button>
-	<button class="absolute top-2 right-7 cursor-pointer hidden group-hover:block" title="Done" onclick={() => todos.done(todo, !todo.done)}>
-		<Check size={22}/>
+	<button class="icon-btn-muted absolute top-2 right-1" title="Delete" aria-label="Delete" onclick={() => todos.delete(todo)}>
+		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+			<line x1="5" y1="5" x2="19" y2="19"></line>
+			<line x1="19" y1="5" x2="5" y2="19"></line>
+		</svg>
 	</button>
 </div>
